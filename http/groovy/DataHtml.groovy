@@ -17,7 +17,7 @@ public class DataHtml implements Resource {
     
     public String generatePage(DataReader reader, Map<String, String> queries) {
         def writer= new StringWriter()
-        def xml= new MarkupBuilder(writer)
+        def xml= new MarkupBuilder(new IndentPrinter(new PrintWriter(writer), "", false))
         def queryValues= Queries.parseQuery(queries)
         
         switch(queryValues[Queries.table]) {

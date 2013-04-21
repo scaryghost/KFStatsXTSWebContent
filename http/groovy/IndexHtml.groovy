@@ -18,6 +18,7 @@ public class IndexHtml implements Resource {
 
     public IndexHtml() {
         visualizations= [:]
+        visualizations["totals"]= {queries, category, type -> replaceHtml(queries, category)}
         visualizations["records"]= {queries, category, type -> pagedTable(queries, category)}
         visualizations["weapons"]= {queries, category, type -> resizedVisualization(queries, category, type)}
         visualizations["kills"]= visualizations["weapons"]
@@ -27,6 +28,15 @@ public class IndexHtml implements Resource {
         navLeft= ["totals", "difficulties", "levels", "deaths"]
         navRight= ["records"]
         dataJsonObj= new DataJson()
+    }
+
+    protected String replaceHtml(def queries, def category) {
+        """
+        google.setOnLoadCallback(draw${category});
+        function draw${category}() {
+            document.getElementById('${category}_div').innerHTML= "${new DataHtml().generatePage(reader, queries)}";
+        }
+    """
     }
 
     protected String simpleVisualization(def queries, def category, def type) {
