@@ -69,18 +69,8 @@ public class DataJson implements Resource {
                     [v: totals["time"], f: Time.secToStr(totals["time"]), p:[style: colStyle]],
                 ]]
                 break
-            case "deaths":
-                columns= [["Death", "string"], ["Count", "number"]].collect {
-                    [label: it[0], type: it[1]]
-                }
-                reader.getDeaths().each {row ->
-                    data << [c: [[v: row.name, f:null, p: null], 
-                        [v: row.count, f: null, p:[style: colStyle]],
-                    ]]
-                }
-                break
             case "records":
-                columns= [["Name", "string"], ["Wins", "numbers"], ["Losses", "number"], ["Disconnects", "number"]].collect {
+                columns= [["Name", "string"], ["Wins", "number"], ["Losses", "number"], ["Disconnects", "number"]].collect {
                     [label: it[0], type: it[1]]
                 }
 
@@ -93,15 +83,16 @@ public class DataJson implements Resource {
                 break
             case "sessions":
                 columns= [["Level", "string"], ["Difficulty", "string"], ["Length", "string"],
-                        ["Result", "string"], ["Wave", "number"], ["Timestamp", "string"]].collect {
+                        ["Result", "string"], ["Wave", "number"], ["Duration", "number"], ["Timestamp", "string"]].collect {
                     [label: it[0], type: it[1]]
                 }
                 WebCommon.partialQuery(reader, queryValues, false).each {row ->
                     data << [c: [[v: row.level, f:null, p: null], 
-                        [v: row.difficulty, f: null, p:[style: colStyle]],
+                        [v: row.name, f: null, p:[style: colStyle]],
                         [v: row.length, f: null, p:[style: colStyle]],
                         [v: row.result, f: null, p:[style: colStyle]],
                         [v: row.wave, f: null, p:[style: colStyle]],
+                        [v: row.duration, f: Time.secToStr(row.duration), p:[style: colStyle]],
                         [v: row.timestamp, f: null, p:[style: colStyle]],
                     ]]
                 }

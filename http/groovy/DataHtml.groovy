@@ -56,7 +56,7 @@ public class DataHtml implements Resource {
                                 tr() {
                                     td("Wins")
                                     td(row.wins)
-                                    td(rowspan: "4") {
+                                    td(rowspan: "6") {
                                         img(src: steamIdInfo.avatar)
                                     }
                                 }
@@ -67,6 +67,14 @@ public class DataHtml implements Resource {
                                 tr() {
                                     td("Disconnects")
                                     td(row.disconnects)
+                                }
+                                tr() {
+                                    td("Finales Played")
+                                    td(row.final_wave_reached)
+                                }
+                                tr() {
+                                    td("Finales Survived")
+                                    td(row.final_wave_survived)
                                 }
                                 tr() {
                                     td("Steam Community")

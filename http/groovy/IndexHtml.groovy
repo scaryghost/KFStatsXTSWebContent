@@ -25,7 +25,7 @@ public class IndexHtml implements Resource {
         visualizations["deaths"]= visualizations["weapons"]
         visualizations["perks"]= {queries, category, type -> simpleVisualization(queries, category, type)}
 
-        navLeft= ["totals", "difficulties", "levels", "deaths"]
+        navLeft= ["totals", "difficulties", "levels"]
         navRight= ["records"]
         dataJsonObj= new DataJson()
     }
@@ -155,7 +155,7 @@ public class IndexHtml implements Resource {
         def htmlBuilder= new MarkupBuilder(writer)
 
         htmlBuilder.html() {
-            head() {
+            htmlBuilder.head() {
                 meta('http-equiv':'content-type', content:'text/html; charset=utf-8')
                 title("KFStatsX")
                 
