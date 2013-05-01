@@ -70,11 +70,11 @@ public class DataHtml implements Resource {
                                 }
                                 tr() {
                                     td("Finales Played")
-                                    td(row.final_wave_reached)
+                                    td(row.finale_played)
                                 }
                                 tr() {
                                     td("Finales Survived")
-                                    td(row.final_wave_survived)
+                                    td(row.finale_survived)
                                 }
                                 tr() {
                                     td("Steam Community")
