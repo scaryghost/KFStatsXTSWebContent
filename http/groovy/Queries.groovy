@@ -13,7 +13,9 @@ public enum Queries {
     steamid64,
     order,
     group,
-    table
+    table,
+    difficulty,
+    length
 
     public static defaults= [(page): 0, (rows): 25, (order): "asc", (group): "none"]
     public static def parseQuery(def queries) {

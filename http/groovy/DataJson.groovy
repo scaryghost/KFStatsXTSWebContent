@@ -93,10 +93,34 @@ public class DataJson implements Resource {
                         [v: row.result, f: null, p:[style: colStyle]],
                         [v: row.wave, f: null, p:[style: colStyle]],
                         [v: row.duration, f: Time.secToStr(row.duration), p:[style: colStyle]],
-                        [v: row.timestamp, f: null, p:[style: colStyle]],
+                        [v: row.timestamp, f: null, p:[style: colStyle]]
                     ]]
                 }
                 break
+            case "wave":
+                def waveSplit= [:], statKeys= new TreeSet()
+
+                reader.getWaveData(queryValues[Queries.difficulty], queryValues[Queries.length], queryValues[Queries.group]).each {row ->
+                    statKeys << row.stat
+                    if (waveSplit[row.wave] == null) {
+                        waveSplit[row.wave]= [:]
+                    }
+                    waveSplit[row.wave][row.stat]= row.value
+                }
+
+                columns= [["Wave", "string"]]
+                statKeys.each {key ->
+                    columns << [key, "number"]
+                }
+                columns= columns.collect{[label: it[0], type: it[1]]}
+                waveSplit.each {waveNum, stats ->
+                    def values= [[v:waveNum.toString(), f:null]]
+                    statKeys.each {key ->
+                        values << [v:stats[key] == null ? 0 : stats[key], f:null]
+                    }
+                    data << [c: values]
+                }
+                break;
             default:
                 def query, psValues
                 def results
