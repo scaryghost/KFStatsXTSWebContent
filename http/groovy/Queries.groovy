@@ -14,7 +14,7 @@ public enum Queries {
     order,
     group,
     table,
-    difficulty,
+    name,
     length
 
     public static defaults= [(page): 0, (rows): 25, (order): "asc", (group): "none"]

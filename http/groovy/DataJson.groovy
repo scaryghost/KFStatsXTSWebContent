@@ -29,7 +29,7 @@ public class DataJson implements Resource {
                     [label: it[0], type: it[1]]
                 }
                 reader.getDifficulties().each {row ->
-                    data << [c: [[v: row.name, f:null, p: null], 
+                    data << [c: [[v: row.name, f:"<a href='difficulty.html?name=${row.name}&length=${row.length}&table=wave'>${row.name}</a>", p: null], 
                         [v: row.length, f: null, p:[style: colStyle]],
                         [v: row.wins, f: null, p:[style: colStyle]],
                         [v: row.losses, f: null, p:[style: colStyle]],
@@ -100,7 +100,7 @@ public class DataJson implements Resource {
             case "wave":
                 def waveSplit= [:], statKeys= new TreeSet()
 
-                reader.getWaveData(queryValues[Queries.difficulty], queryValues[Queries.length], queryValues[Queries.group]).each {row ->
+                reader.getWaveData(queryValues[Queries.name], queryValues[Queries.length], queryValues[Queries.group]).each {row ->
                     statKeys << row.stat
                     if (waveSplit[row.wave] == null) {
                         waveSplit[row.wave]= [:]
