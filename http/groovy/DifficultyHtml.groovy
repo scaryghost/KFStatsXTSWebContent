@@ -12,10 +12,21 @@ public class DifficultyHtml extends IndexHtml {
 
     protected String dashboardVisualization(def queries) {
         """
+        //Column filtering taken from: http://jsfiddle.net/asgallant/WaUu2/
         google.setOnLoadCallback(drawDashboard);
         function drawDashboard() {
             var dashboard= new google.visualization.Dashboard(document.getElementById('dashboard_div'));
             var data= new google.visualization.DataTable(${dataJsonObj.generatePage(reader, queries)});
+
+            var columnsTable = new google.visualization.DataTable();
+            columnsTable.addColumn('number', 'colIndex');
+            columnsTable.addColumn('string', 'colLabel');
+            var initState= {selectedValues: []};
+            // put the columns into this data table (skip column 0)
+            for (var i = 1; i < data.getNumberOfColumns(); i++) {
+                columnsTable.addRow([i, data.getColumnLabel(i)]);
+                initState.selectedValues.push(data.getColumnLabel(i));
+            }
 
             var donutRangeSlider= new google.visualization.ControlWrapper({
                 'controlType': 'CategoryFilter',
@@ -29,6 +40,22 @@ public class DifficultyHtml extends IndexHtml {
                     }
                 }
             });
+            var columnFilter = new google.visualization.ControlWrapper({
+                controlType: 'CategoryFilter',
+                containerId: 'colFilter_div',
+                dataTable: columnsTable,
+                options: {
+                    filterColumnLabel: 'colLabel',
+                    ui: {
+                        label: 'Columns',
+                        allowTyping: false,
+                        allowMultiple: true,
+                        selectedValuesLayout: 'horizontal'
+                    }
+                },
+                state: initState
+            });
+            
             var pieChart= new google.visualization.ChartWrapper({
                 'chartType': 'LineChart',
                 'containerId': 'chart_div',
@@ -41,6 +68,24 @@ public class DifficultyHtml extends IndexHtml {
             });
             dashboard.bind(donutRangeSlider, pieChart);
             dashboard.draw(data);
+
+            google.visualization.events.addListener(columnFilter, 'statechange', function () {
+                var state = columnFilter.getState();
+                var row;
+                var columnIndices = [0];
+                for (var i = 0; i < state.selectedValues.length; i++) {
+                    row = columnsTable.getFilteredRows([{column: 1, value: state.selectedValues[i]}])[0];
+                    columnIndices.push(columnsTable.getValue(row, 0));
+                }
+                // sort the indices into their original order
+                columnIndices.sort(function (a, b) {
+                    return (a - b);
+                });
+                pieChart.setView({columns: columnIndices});
+                pieChart.draw();
+            });
+    
+            columnFilter.draw();
         }
     """
     }
@@ -68,6 +113,7 @@ public class DifficultyHtml extends IndexHtml {
             body() {
                 div(id:'dashboard_div') {
                     div(id:'filter_div', '')
+                    div(id:'colFilter_div', '')
                     div(id:'chart_div', '')
                 }
             }
