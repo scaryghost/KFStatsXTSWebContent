@@ -5,7 +5,8 @@ import groovy.xml.MarkupBuilder
 public class IndexHtml implements Resource {
     protected def visualizations, navLeft, navRight, dataJsonObj, reader
     protected def chartTypes= [deaths: 'BarChart', perks: 'PieChart', weapons: 'BarChart', kills: 'BarChart']
-    protected static def jsFiles= ['http/js/jquery-1.9.1.min.js', 'https://www.google.com/jsapi?autoload={"modules":[{"name":"visualization","version":"1"}]}']
+    protected static def jsFiles= ['//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js', 
+            'https://www.google.com/jsapi?autoload={"modules":[{"name":"visualization","version":"1","packages":["controls"]}]}']
     protected static def stylesheets= ['http/css/kfstatsxHtml.css']
     protected static def scrollingJs= """
         //Div scrolling js taken from http://gazpo.com/2012/03/horizontal-content-scroll/

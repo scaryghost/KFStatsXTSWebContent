@@ -3,19 +3,17 @@ import com.github.etsai.kfsxtrackingserver.web.Resource
 import groovy.xml.MarkupBuilder
 
 public class DifficultyHtml extends IndexHtml {
-    protected static def jsFiles= ['http/js/jquery-1.9.1.min.js', 
-        'https://www.google.com/jsapi?autoload={"modules":[{"name":"visualization","version":"1","packages":["controls"]}]}']
-
     public DifficultyHtml() {
         super()
     }
 
-    protected String dashboardVisualization(def queries) {
+    protected String dashboardVisualization(def queries, def category) {
+        queries["group"]= category
         """
         //Column filtering taken from: http://jsfiddle.net/asgallant/WaUu2/
-        google.setOnLoadCallback(drawDashboard);
-        function drawDashboard() {
-            var dashboard= new google.visualization.Dashboard(document.getElementById('dashboard_div'));
+        google.setOnLoadCallback(drawDashboard${category});
+        function drawDashboard${category}() {
+            var dashboard= new google.visualization.Dashboard(document.getElementById('${category}_dashboard_div'));
             var data= new google.visualization.DataTable(${dataJsonObj.generatePage(reader, queries)});
 
             var columnsTable = new google.visualization.DataTable();
@@ -30,7 +28,7 @@ public class DifficultyHtml extends IndexHtml {
 
             var donutRangeSlider= new google.visualization.ControlWrapper({
                 'controlType': 'CategoryFilter',
-                'containerId': 'filter_div',
+                'containerId': '${category}_dashboard_filter1_div',
                 'options': {
                   'filterColumnLabel': 'Wave',
                   'ui': {
@@ -42,7 +40,7 @@ public class DifficultyHtml extends IndexHtml {
             });
             var columnFilter = new google.visualization.ControlWrapper({
                 controlType: 'CategoryFilter',
-                containerId: 'colFilter_div',
+                containerId: '${category}_dashboard_filter2_div',
                 dataTable: columnsTable,
                 options: {
                     filterColumnLabel: 'colLabel',
@@ -58,10 +56,10 @@ public class DifficultyHtml extends IndexHtml {
             
             var pieChart= new google.visualization.ChartWrapper({
                 'chartType': 'LineChart',
-                'containerId': 'chart_div',
+                'containerId': '${category}_dashboard_chart_div',
                 'options': {
-                  'width': 1680,
-                  'height': 1050,
+                  'height': document.getElementById('${category}_dashboard_div').offsetHeight * 0.9,
+                  'width': document.getElementById('${category}_dashboard_div').offsetWidth * 0.975,
                   'legend': 'right',
                   'pointSize': 5
                 }
@@ -86,6 +84,7 @@ public class DifficultyHtml extends IndexHtml {
             });
     
             columnFilter.draw();
+
         }
     """
     }
@@ -93,6 +92,7 @@ public class DifficultyHtml extends IndexHtml {
     public String generatePage(DataReader reader, Map<String, String> queries) {
         def writer= new StringWriter()
         def htmlBuilder= new MarkupBuilder(writer)
+        def nav= reader.getWaveDataCategories()
         this.reader= reader
 
         htmlBuilder.html() {
@@ -101,20 +101,50 @@ public class DifficultyHtml extends IndexHtml {
                 title("KFStatsX")
 
                 link(rel:'shortcut icon', href: 'http/ico/favicon.ico')
+                stylesheets.each {filename ->
+                    link(href: filename, rel:'stylesheet', type:'text/css')
+                }
                 
                 jsFiles.each {filename ->
                     script(type:'text/javascript', src:filename, '')
                 }
+                script(type:'text/javascript', scrollingJs)
                 htmlBuilder.script(type: 'text/javascript') {
                     mkp.yieldUnescaped(dashboardVisualization(queries))
                 }
-                
+                nav.each {item ->
+                    script(type: 'text/javascript') {
+                        mkp.yieldUnescaped(dashboardVisualization(queries, item))
+                    }
+                }
             }
             body() {
-                div(id:'dashboard_div') {
-                    div(id:'filter_div', '')
-                    div(id:'colFilter_div', '')
-                    div(id:'chart_div', '')
+                div(id:'wrap') {
+                    div(id: 'nav') {
+                        h3("Navigation") {
+                            select(onchange:'goto(this.options[this.selectedIndex].value); return false') {
+                                nav.each {item ->
+                                    def attr= [value: "#${item}_dashboard_div"]
+                                    if (item == nav.first()) {
+                                        attr["selected"]= "selected"
+                                    }
+                                    option(attr, item)
+                                }
+                            }
+                        }
+                        
+                    }
+                    div(id:'content') {
+                        div(class:'contentbox-wrapper') {
+                            nav.each {item ->
+                                div(id: item + '_dashboard_div', class:'contentbox', '') {
+                                    div(id: item + "_dashboard_filter1_div", '')
+                                    div(id: item + "_dashboard_filter2_div", '')
+                                    div(id: item + "_dashboard_chart_div", '')
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
