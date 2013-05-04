@@ -10,13 +10,13 @@ public class IndexXml implements Resource {
 
         xmlBuilder.mkp.pi("xml-stylesheet":[type:"text/xsl",href:"http/xsl/index.xsl"])
         xmlBuilder.kfstatsx() {
-            'stats'(category:"totals") {
+            xmlBuilder.'stats'(category:"totals") {
                 WebCommon.generateSummary(reader).each {attr ->
                     'entry'(attr)
                 }
             }
             
-            'stats'(category:"difficulties") {
+            xmlBuilder.'stats'(category:"difficulties") {
                 def wins= 0, losses= 0, time= 0
                 reader.getDifficulties().each {row ->
                     def attr= [:]
@@ -35,7 +35,7 @@ public class IndexXml implements Resource {
                 'total'(name: "Total", length: "", wins: wins, losses:losses, 
                     wave: "", time:Time.secToStr(time))
             }
-            'stats'(category:"levels") {
+            xmlBuilder.'stats'(category:"levels") {
                 def wins= 0, losses= 0, time= 0
                 reader.getLevels().each {row ->
                     def attr= [:]
@@ -52,14 +52,6 @@ public class IndexXml implements Resource {
                     'entry'(attr)
                 }
                 'total'(name: "Total", wins: wins, losses:losses, time:Time.secToStr(time))
-            }
-            'stats'(category:"deaths") {
-                reader.getDeaths().each {row ->
-                    def attr= [:]
-                    attr["name"]= row.name
-                    attr["value"]= row.count
-                    'entry'(attr)
-                }
             }
             reader.getAggregateCategories().each {category ->
                 xmlBuilder.'stats'(category: category) {

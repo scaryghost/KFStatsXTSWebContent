@@ -15,17 +15,28 @@ public class IndexHtml implements Resource {
             \$(".contentbox-wrapper").animate({"left": -(\$(id).position().left)}, 600);
         }
     """
-    
+    protected static def jsChartCommon= """
+        google.setOnLoadCallback(visualizationCallback);
+
+        function drawChart(data, title, divId, chartType) {
+            var chart= new google.visualization.ChartWrapper({'chartType': chartType, 'containerId': divId, 'options': {
+                'chartArea': {height: '90%'},
+                'vAxis': {textStyle: {fontSize: 15}},
+                'allowHtml': true
+            }});
+            chart.setDataTable(data);
+            chart.setOption('title', title);
+            chart.setOption('height', Math.max(chart.getDataTable().getNumberOfRows() * 25, document.getElementById(divId).offsetHeight * 0.975));
+            chart.setOption('width', document.getElementById(divId).offsetWidth * 0.985);
+            chart.draw();
+        }
+        function visualizationCallback() {
+"""
 
     public IndexHtml() {
         visualizations= [:]
         visualizations["totals"]= {queries, category, type -> replaceHtml(queries, category)}
         visualizations["records"]= {queries, category, type -> pagedTable(queries, category)}
-        visualizations["weapons"]= {queries, category, type -> resizedVisualization(queries, category, type)}
-        visualizations["kills"]= visualizations["weapons"]
-        visualizations["deaths"]= visualizations["weapons"]
-        visualizations["perks"]= {queries, category, type -> simpleVisualization(queries, category, type)}
-
         navLeft= ["totals", "difficulties", "levels"]
         navRight= ["records"]
         dataJsonObj= new DataJson()
@@ -40,38 +51,13 @@ public class IndexHtml implements Resource {
     """
     }
 
-    protected String simpleVisualization(def queries, def category, def type) {
-        """
-        google.setOnLoadCallback(draw${category});
-        function draw${category}() {
-            var data= new google.visualization.DataTable(${dataJsonObj.generatePage(reader, queries)});
-            var chart= new google.visualization.ChartWrapper({'chartType': '$type', 'containerId': '${category}_div', 'options': {allowHtml: true}});
-            chart.setDataTable(data);
-            chart.setOption('title', '${category}');
-            chart.setOption('height', document.getElementById('${category}_div').offsetHeight * 0.975);
-            chart.setOption('width', document.getElementById('${category}_div').offsetWidth * 0.985);
-            chart.draw();
+    protected String generateCommonJs(def parameters) {
+        def chartCalls= ""
+        parameters.each {param ->
+            def chartType= param[3] == null ? 'Table' : param[3]
+            chartCalls+= "            drawChart(${param[0]}, '${param[1]}', '${param[2]}', '${chartType}');\n"
         }
-    """
-    }
-
-    protected String resizedVisualization(def queries, def category, def type) {
-        """
-        google.setOnLoadCallback(draw${category});
-        function draw${category}() {
-            var data= new google.visualization.DataTable(${dataJsonObj.generatePage(reader, queries)});
-            var chart= new google.visualization.ChartWrapper({'chartType': '$type', 'containerId': '${category}_div', 'options': {
-                'legend': {position: 'none'},
-                'chartArea': {height: '90%'},
-                'vAxis': {textStyle: {fontSize: 15}}
-            }});
-            chart.setDataTable(data);
-            chart.setOption('title', '$category');
-            chart.setOption('height', chart.getDataTable().getNumberOfRows() * 25);
-            chart.setOption('width', document.getElementById('${category}_div').offsetWidth * 0.985);
-            chart.draw();
-        }
-    """
+        return "$jsChartCommon$chartCalls        }\n    "
     }
 
     protected String pagedTable(def queries, def category) {
@@ -170,21 +156,19 @@ public class IndexHtml implements Resource {
                 }
                 script(type:'text/javascript', scrollingJs)
 
-                nav.each {
-                    def js
-                    queries["table"]= it
-                    if (visualizations[it] != null) {
-                        if (chartTypes[it] != null) {
-                            js= visualizations[it](queries, it, chartTypes[it])
-                        } else {
-                            js= visualizations[it](queries, it, 'Table')
+                def stndChartsParams= []
+                nav.each {navItem ->
+                    queries["table"]= navItem
+                    if (visualizations[navItem] != null) {
+                        script(type: 'text/javascript') {
+                            mkp.yieldUnescaped(visualizations[navItem](queries, navItem, chartTypes[navItem]))
                         }
                     } else {
-                        js= simpleVisualization(queries, it, 'Table')
+                        stndChartsParams << [dataJsonObj.generatePage(reader, queries), navItem, "${navItem}_div", chartTypes[navItem]]
                     }
-                    script(type: 'text/javascript') {
-                        mkp.yieldUnescaped(js)
-                    }
+                }
+                script(type: 'text/javascript') {
+                    mkp.yieldUnescaped(generateCommonJs(stndChartsParams))
                 }
             }
             body() {
