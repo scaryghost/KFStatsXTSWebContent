@@ -3,7 +3,7 @@ import com.github.etsai.kfsxtrackingserver.web.Resource
 import groovy.xml.MarkupBuilder
 
 public class IndexHtml implements Resource {
-    protected def visualizations, navLeft, navRight, dataJsonObj, reader
+    protected def htmlDiv, nav
     protected def chartTypes= [deaths: 'BarChart', perks: 'PieChart', weapons: 'BarChart', kills: 'BarChart']
     protected static def jsFiles= ['//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js', 
             'https://www.google.com/jsapi?autoload={"modules":[{"name":"visualization","version":"1","packages":["controls"]}]}']
@@ -17,6 +17,10 @@ public class IndexHtml implements Resource {
     """
     protected static def jsChartCommon= """
         google.setOnLoadCallback(visualizationCallback);
+
+        function replaceHtml(html, divId) {
+            document.getElementById(divId).innerHTML= html;
+        }
 
         function drawChart(data, title, divId, chartType) {
             var chart= new google.visualization.ChartWrapper({'chartType': chartType, 'containerId': divId, 'options': {
@@ -34,34 +38,28 @@ public class IndexHtml implements Resource {
 """
 
     public IndexHtml() {
-        visualizations= [:]
-        visualizations["totals"]= {queries, category, type -> replaceHtml(queries, category)}
-        navLeft= ["totals", "difficulties", "levels"]
-        navRight= []
-        dataJsonObj= new DataJson()
-    }
-
-    protected String replaceHtml(def queries, def category) {
-        """
-        google.setOnLoadCallback(draw${category});
-        function draw${category}() {
-            document.getElementById('${category}_div').innerHTML= "${new DataHtml().generatePage(reader, queries)}";
-        }
-    """
+        htmlDiv= new HashSet()
+        htmlDiv << "totals"
+        nav= ["totals", "difficulties", "levels"]
     }
 
     protected String generateCommonJs(def parameters) {
         def chartCalls= ""
         parameters.each {param ->
             def chartType= param[3] == null ? 'Table' : param[3]
-            chartCalls+= "            drawChart(${param[0]}, '${param[1]}', '${param[2]}', '${chartType}');\n"
+            if (param[1] == null) {
+                chartCalls+= "            replaceHtml(\"${param[0]}\", '${param[2]}');\n"
+            } else {
+                chartCalls+= "            drawChart(${param[0]}, '${param[1]}', '${param[2]}', '${chartType}');\n"
+            }
         }
         return "$jsChartCommon$chartCalls        }\n    "
     }
 
     public String generatePage(DataReader reader, Map<String, String> queries) {
-        def nav= navLeft.plus(reader.getAggregateCategories()).plus(navRight)
-        this.reader= reader
+        def dataJson= new DataJson()
+        def dataHtml= new DataHtml()
+        def nav= nav.plus(reader.getAggregateCategories())
         
         def writer= new StringWriter()
         def htmlBuilder= new MarkupBuilder(writer)
@@ -84,12 +82,10 @@ public class IndexHtml implements Resource {
                 def stndChartsParams= []
                 nav.each {navItem ->
                     queries["table"]= navItem
-                    if (visualizations[navItem] != null) {
-                        script(type: 'text/javascript') {
-                            mkp.yieldUnescaped(visualizations[navItem](queries, navItem, chartTypes[navItem]))
-                        }
+                    if (htmlDiv.contains(navItem)) {
+                        stndChartsParams << [dataHtml.generatePage(reader, queries), null, "${navItem}_div", null]
                     } else {
-                        stndChartsParams << [dataJsonObj.generatePage(reader, queries), navItem, "${navItem}_div", chartTypes[navItem]]
+                        stndChartsParams << [dataJson.generatePage(reader, queries), navItem, "${navItem}_div", chartTypes[navItem]]
                     }
                 }
                 script(type: 'text/javascript') {

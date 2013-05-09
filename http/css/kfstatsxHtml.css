@@ -90,8 +90,17 @@ h4 {
     font-size: 15px;
 }
 
+#footer{
+    text-align:center;
+    margin-top:20px;
+    color: #c0c0c0;
+}    
+
 .content-table {
-    width: 630px;
-    cellpadding: 0;
-    cellspacing: 6;
+    width: 720px;
+    border-collapse: collapse;
+}
+
+td {
+    width:240px;
 }

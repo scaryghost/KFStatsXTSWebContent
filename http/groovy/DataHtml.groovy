@@ -5,6 +5,7 @@
 
 import com.github.etsai.kfsxtrackingserver.DataReader
 import com.github.etsai.kfsxtrackingserver.web.*
+import com.github.etsai.utils.Time
 import groovy.xml.MarkupBuilder
 
 /**
@@ -12,7 +13,6 @@ import groovy.xml.MarkupBuilder
  * @author etsai
  */
 public class DataHtml implements Resource {
-    private static def colStyle= "text-align:center"
     private static def tableAttr= [class: "content-table"]
     
     public String generatePage(DataReader reader, Map<String, String> queries) {
@@ -51,12 +51,12 @@ public class DataHtml implements Resource {
                             tbody() {
                                 tr() {
                                     td("Name")
-                                    td(steamIdInfo.name)
+                                    td(colspan: "2", steamIdInfo.name)
                                 }
                                 tr() {
                                     td("Wins")
                                     td(row.wins)
-                                    td(rowspan: "6") {
+                                    td(rowspan: "7", align: "center") {
                                         img(src: steamIdInfo.avatar)
                                     }
                                 }
@@ -77,9 +77,17 @@ public class DataHtml implements Resource {
                                     td(row.finale_survived)
                                 }
                                 tr() {
-                                    td("Steam Community")
-                                    td() {
-                                        a(target: "_blank", href: "http://steamcommunity.com/profiles/" + steamid64, steamid64)
+                                    td("Time Connected")
+                                    td(Time.secToStr(row.time_connected))
+                                }
+                                tr() {
+                                    td(colspan: "2") {
+                                        a(target: "_blank", href: "http://steamcommunity.com/profiles/" + steamid64, "Steam Community Page")
+                                    }
+                                }
+                                tr() {
+                                    td(colspan:"3") {
+                                        a(target: "_blank", href: "sessions.html?steamid64=" + steamid64, "Match History")
                                     }
                                 }
                             }

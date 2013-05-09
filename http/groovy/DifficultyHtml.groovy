@@ -7,7 +7,8 @@ public class DifficultyHtml extends IndexHtml {
         super()
     }
 
-    protected String dashboardVisualization(def queries, def category) {
+    protected String dashboardVisualization(def reader, def queries, def category) {
+        def dataJsonObj= new DataJson()
         queries["group"]= category
         """
         //Column filtering taken from: http://jsfiddle.net/asgallant/WaUu2/
@@ -93,7 +94,6 @@ public class DifficultyHtml extends IndexHtml {
         def writer= new StringWriter()
         def htmlBuilder= new MarkupBuilder(writer)
         def nav= reader.getWaveDataCategories()
-        this.reader= reader
 
         htmlBuilder.html() {
             htmlBuilder.head() {
@@ -110,11 +110,11 @@ public class DifficultyHtml extends IndexHtml {
                 }
                 script(type:'text/javascript', scrollingJs)
                 htmlBuilder.script(type: 'text/javascript') {
-                    mkp.yieldUnescaped(dashboardVisualization(queries))
+                    mkp.yieldUnescaped(dashboardVisualization(reader, queries))
                 }
                 nav.each {item ->
                     script(type: 'text/javascript') {
-                        mkp.yieldUnescaped(dashboardVisualization(queries, item))
+                        mkp.yieldUnescaped(dashboardVisualization(reader, queries, item))
                     }
                 }
             }
