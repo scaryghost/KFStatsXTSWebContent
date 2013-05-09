@@ -6,30 +6,24 @@ public class DifficultyHtml extends IndexHtml {
     public DifficultyHtml() {
         super()
     }
-
-    protected String dashboardVisualization(def reader, def queries, def category) {
-        def dataJsonObj= new DataJson()
-        queries["group"]= category
-        """
-        //Column filtering taken from: http://jsfiddle.net/asgallant/WaUu2/
-        google.setOnLoadCallback(drawDashboard${category});
-        function drawDashboard${category}() {
-            var dashboard= new google.visualization.Dashboard(document.getElementById('${category}_dashboard_div'));
-            var data= new google.visualization.DataTable(${dataJsonObj.generatePage(reader, queries)});
+    protected static def dasboardJs= """
+        function drawDashboard(data, category) {
+            var divName= category + "_dashboard";
+            var dashboard=  new google.visualization.Dashboard(document.getElementById(divName + '_div'))
+            var dataTable= new google.visualization.DataTable(data);
 
             var columnsTable = new google.visualization.DataTable();
             columnsTable.addColumn('number', 'colIndex');
             columnsTable.addColumn('string', 'colLabel');
             var initState= {selectedValues: []};
             // put the columns into this data table (skip column 0)
-            for (var i = 1; i < data.getNumberOfColumns(); i++) {
-                columnsTable.addRow([i, data.getColumnLabel(i)]);
-                initState.selectedValues.push(data.getColumnLabel(i));
+            for (var i = 1; i < dataTable.getNumberOfColumns(); i++) {
+                columnsTable.addRow([i, dataTable.getColumnLabel(i)]);
+                initState.selectedValues.push(dataTable.getColumnLabel(i));
             }
-
             var donutRangeSlider= new google.visualization.ControlWrapper({
                 'controlType': 'CategoryFilter',
-                'containerId': '${category}_dashboard_filter1_div',
+                'containerId': divName + '_filter1_div',
                 'options': {
                   'filterColumnLabel': 'Wave',
                   'ui': {
@@ -41,7 +35,7 @@ public class DifficultyHtml extends IndexHtml {
             });
             var columnFilter = new google.visualization.ControlWrapper({
                 controlType: 'CategoryFilter',
-                containerId: '${category}_dashboard_filter2_div',
+                containerId: divName + '_filter2_div',
                 dataTable: columnsTable,
                 options: {
                     filterColumnLabel: 'colLabel',
@@ -55,18 +49,18 @@ public class DifficultyHtml extends IndexHtml {
                 state: initState
             });
             
-            var pieChart= new google.visualization.ChartWrapper({
+            var chart= new google.visualization.ChartWrapper({
                 'chartType': 'LineChart',
-                'containerId': '${category}_dashboard_chart_div',
+                'containerId': divName + '_chart_div',
                 'options': {
-                  'height': document.getElementById('${category}_dashboard_div').offsetHeight * 0.9,
-                  'width': document.getElementById('${category}_dashboard_div').offsetWidth * 0.975,
+                  'height': document.getElementById(divName + '_div').offsetHeight * 0.9,
+                  'width': document.getElementById(divName + '_div').offsetWidth * 0.975,
                   'legend': 'right',
                   'pointSize': 5
                 }
             });
-            dashboard.bind(donutRangeSlider, pieChart);
-            dashboard.draw(data);
+            dashboard.bind(donutRangeSlider, chart);
+            dashboard.draw(dataTable);
 
             google.visualization.events.addListener(columnFilter, 'statechange', function () {
                 var state = columnFilter.getState();
@@ -80,20 +74,31 @@ public class DifficultyHtml extends IndexHtml {
                 columnIndices.sort(function (a, b) {
                     return (a - b);
                 });
-                pieChart.setView({columns: columnIndices});
-                pieChart.draw();
+                chart.setView({columns: columnIndices});
+                chart.draw();
             });
     
             columnFilter.draw();
 
         }
-    """
+        //Column filtering taken from: http://jsfiddle.net/asgallant/WaUu2/
+        google.setOnLoadCallback(visualizationCallback);
+        function visualizationCallback() {
+"""
+
+    protected String dashboardVisualization(def parameters) {
+        def chartCalls= ""
+        parameters.each {param ->
+            chartCalls+= "            drawDashboard(${param[0]}, '${param[1]}');\n"
+        }
+        return "$dasboardJs$chartCalls        }\n    "
     }
 
     public String generatePage(DataReader reader, Map<String, String> queries) {
         def writer= new StringWriter()
         def htmlBuilder= new MarkupBuilder(writer)
         def nav= reader.getWaveDataCategories()
+        def dataJson= new DataJson()
 
         htmlBuilder.html() {
             htmlBuilder.head() {
@@ -109,13 +114,13 @@ public class DifficultyHtml extends IndexHtml {
                     script(type:'text/javascript', src:filename, '')
                 }
                 script(type:'text/javascript', scrollingJs)
-                htmlBuilder.script(type: 'text/javascript') {
-                    mkp.yieldUnescaped(dashboardVisualization(reader, queries))
-                }
+                def parameters= []
                 nav.each {item ->
-                    script(type: 'text/javascript') {
-                        mkp.yieldUnescaped(dashboardVisualization(reader, queries, item))
-                    }
+                    queries.group= item
+                    parameters << [dataJson.generatePage(reader, queries), item]
+                }
+                script(type: 'text/javascript') {
+                    mkp.yieldUnescaped(dashboardVisualization(parameters))
                 }
             }
             body() {
