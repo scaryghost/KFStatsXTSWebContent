@@ -33,7 +33,7 @@ public class DataJson implements Resource {
                         [v: row.length, f: null, p:[style: colStyle]],
                         [v: row.wins, f: null, p:[style: colStyle]],
                         [v: row.losses, f: null, p:[style: colStyle]],
-                        [v: String.format("%.2f",row.wave / (row.wins + row.losses)), f: null, p:[style: colStyle]],
+                        [v: String.format("%.2f",row.waveaccum / (row.wins + row.losses)), f: null, p:[style: colStyle]],
                         [v: row.time, f: Time.secToStr(row.time), p:[style: colStyle]]
                     ]]
                     totals["wins"]+= row.wins
@@ -54,7 +54,7 @@ public class DataJson implements Resource {
                     [label: it[0], type: it[1]]
                 }
                 reader.getLevels().each {row ->
-                    data << [c: [[v: row.name, f:null, p: null], 
+                    data << [c: [[v: row.name, f:"<a href='leveldata.html?table=leveldata&name=${row.name}'>${row.name}</a>", p: null], 
                         [v: row.wins, f: null, p:[style: colStyle]],
                         [v: row.losses, f: null, p:[style: colStyle]],
                         [v: row.time, f: Time.secToStr(row.time), p:[style: colStyle]],
@@ -67,6 +67,28 @@ public class DataJson implements Resource {
                     [v: totals["wins"], f: null, p:[style: colStyle]],
                     [v: totals["losses"], f: null, p:[style: colStyle]],
                     [v: totals["time"], f: Time.secToStr(totals["time"]), p:[style: colStyle]],
+                ]]
+                break
+            case "leveldata":
+                def totals= [wins: 0, losses: 0, time: 0]
+                columns= [["Difficulty", "string"], ["Length", "string"], ["Wins", "number"], ["Losses", "number"], ["Avg Wave", "number"], ["Time", "number"]].collect {
+                    [label: it[0], type: it[1]]
+                }
+                reader.getLevelData(queryValues[Queries.name]).each {row ->
+                    def avgWave= row.waveaccum / (row.wins + row.losses)
+                    data << [c: [[v: row.name], [v:row.length], [v: row.wins], [v: row.losses], [v:avgWave, f: String.format("%.2f",avgWave)], 
+                            [v:row.time, f: Time.secToStr(row.time)]
+                    ]]
+                    totals.wins+= row.wins
+                    totals.losses+= row.losses
+                    totals.time+= row.time
+                }
+                data << [c: [[v: "Totals", f:null], 
+                    [v: "", f: "---"],
+                    [v: totals["wins"], f: null],
+                    [v: totals["losses"], f: null],
+                    [v: 0, f: "---"],
+                    [v: totals["time"], f: Time.secToStr(totals["time"])],
                 ]]
                 break
             case "records":

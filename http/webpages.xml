@@ -5,6 +5,7 @@
     <page name="difficulty.html" script="DifficultyHtml.groovy" />
     <page name="index.html" script="IndexHtml.groovy" />
     <page name="index.xml" script="IndexXml.groovy" />
+    <page name="leveldata.html" script="LevelDataHtml.groovy" />
     <page name="records.html" script="RecordsHtml.groovy" />
     <page name="records.xml" script="RecordsXml.groovy" />
     <page name="profile.html" script="ProfileHtml.groovy" />

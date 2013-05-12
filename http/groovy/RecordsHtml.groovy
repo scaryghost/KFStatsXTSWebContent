@@ -88,8 +88,6 @@ public class RecordsHtml extends IndexHtml {
     }
 
     public String generatePage(DataReader reader, Map<String, String> queries) {
-        this.reader= reader
-        
         def writer= new StringWriter()
         def htmlBuilder= new MarkupBuilder(writer)
 
