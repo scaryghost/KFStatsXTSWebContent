@@ -124,8 +124,10 @@ public class DifficultyHtml extends IndexHtml {
                     queries.group= item
                     parameters << [dataJson.generatePage(reader, queries), item]
                 }
-                queries.table= "difficultydata"
-                parameters << [dataJson.generatePage(reader, queries), 'Summary', 'summary_div']
+                if (queries.level == null) {
+                    queries.table= "difficultydata"
+                    parameters << [dataJson.generatePage(reader, queries), 'Summary', 'summary_div']
+                }
                 script(type: 'text/javascript') {
                     mkp.yieldUnescaped(dashboardVisualization(parameters))
                 }
@@ -135,7 +137,9 @@ public class DifficultyHtml extends IndexHtml {
                     div(id: 'nav') {
                         h3("Navigation") {
                             select(onchange:'goto(this.options[this.selectedIndex].value); return false') {
-                                option(value: "#summary_div", selected: "selected", 'Summary')
+                                if (queries.level == null) {
+                                    option(value: "#summary_div", selected: "selected", 'Summary')
+                                }
                                 nav.each {item ->
                                     option(value: "#${item}_dashboard_div", item)
                                 }
@@ -145,7 +149,9 @@ public class DifficultyHtml extends IndexHtml {
                     }
                     div(id:'content') {
                         div(class:'contentbox-wrapper') {
-                            div(id: 'summary_div', class: 'contentbox', '')
+                            if (queries.level == null) {
+                                div(id: 'summary_div', class: 'contentbox', '')
+                            }
                             nav.each {item ->
                                 div(id: item + '_dashboard_div', class:'contentbox', '') {
                                     div(id: item + "_dashboard_filter1_div", '')

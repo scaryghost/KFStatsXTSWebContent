@@ -76,7 +76,8 @@ public class DataJson implements Resource {
                 }
                 reader.getLevelData(queryValues[Queries.name]).each {row ->
                     def avgWave= row.waveaccum / (row.wins + row.losses)
-                    data << [c: [[v: row.name], [v:row.length], [v: row.wins], [v: row.losses], [v:avgWave, f: String.format("%.2f",avgWave)], 
+                    data << [c: [[v: row.name, f:"<a href='difficulty.html?name=${row.name}&length=${row.length}&level=${queryValues[Queries.name]}'>${row.name}</a>", p: null], 
+                            [v:row.length], [v: row.wins], [v: row.losses], [v:avgWave, f: String.format("%.2f",avgWave)], 
                             [v:row.time, f: Time.secToStr(row.time)]
                     ]]
                     totals.wins+= row.wins
@@ -142,8 +143,10 @@ public class DataJson implements Resource {
                 break
             case "wave":
                 def waveSplit= [:], statKeys= new TreeSet()
+                def waveData= queryValues[Queries.level] == null ? reader.getWaveData(queryValues[Queries.name], queryValues[Queries.length], queryValues[Queries.group]) : 
+                        reader.getWaveData(queryValues[Queries.level], queryValues[Queries.name], queryValues[Queries.length], queryValues[Queries.group])
 
-                reader.getWaveData(queryValues[Queries.name], queryValues[Queries.length], queryValues[Queries.group]).each {row ->
+                waveData.each {row ->
                     statKeys << row.stat
                     if (waveSplit[row.wave] == null) {
                         waveSplit[row.wave]= [:]

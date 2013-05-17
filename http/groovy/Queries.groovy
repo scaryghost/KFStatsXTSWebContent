@@ -14,6 +14,7 @@ public enum Queries {
     order,
     group,
     table,
+    level,
     name,
     length
 
