@@ -2,7 +2,7 @@
     <page name="" script="IndexHtml.groovy" />
     <page name="data.html" script="DataHtml.groovy" />
     <page name="data.json" script="DataJson.groovy" />
-    <page name="difficulty.html" script="DifficultyHtml.groovy" />
+    <page name="wavedata.html" script="WaveData.groovy" />
     <page name="index.html" script="IndexHtml.groovy" />
     <page name="index.xml" script="IndexXml.groovy" />
     <page name="leveldata.html" script="LevelDataHtml.groovy" />

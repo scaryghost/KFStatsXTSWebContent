@@ -2,8 +2,8 @@ import com.github.etsai.kfsxtrackingserver.DataReader
 import com.github.etsai.kfsxtrackingserver.web.Resource
 import groovy.xml.MarkupBuilder
 
-public class DifficultyHtml extends IndexHtml {
-    public DifficultyHtml() {
+public class WaveDataHtml extends IndexHtml {
+    public WaveDataHtml() {
         super()
     }
     protected static def dasboardJs= """

@@ -29,7 +29,7 @@ public class DataJson implements Resource {
                     [label: it[0], type: it[1]]
                 }
                 reader.getDifficulties().each {row ->
-                    data << [c: [[v: row.name, f:"<a href='difficulty.html?name=${row.name}&length=${row.length}'>${row.name}</a>", p: null], 
+                    data << [c: [[v: row.name, f:"<a href='wavedata.html?name=${row.name}&length=${row.length}'>${row.name}</a>", p: null], 
                         [v: row.length, f: null, p:[style: colStyle]],
                         [v: row.wins, f: null, p:[style: colStyle]],
                         [v: row.losses, f: null, p:[style: colStyle]],
@@ -76,7 +76,7 @@ public class DataJson implements Resource {
                 }
                 reader.getLevelData(queryValues[Queries.name]).each {row ->
                     def avgWave= row.waveaccum / (row.wins + row.losses)
-                    data << [c: [[v: row.name, f:"<a href='difficulty.html?name=${row.name}&length=${row.length}&level=${queryValues[Queries.name]}'>${row.name}</a>", p: null], 
+                    data << [c: [[v: row.name, f:"<a href='wavedata.html?name=${row.name}&length=${row.length}&level=${queryValues[Queries.name]}'>${row.name}</a>", p: null], 
                             [v:row.length], [v: row.wins], [v: row.losses], [v:avgWave, f: String.format("%.2f",avgWave)], 
                             [v:row.time, f: Time.secToStr(row.time)]
                     ]]
