@@ -29,7 +29,7 @@ public class DataJson implements Resource {
                     [label: it[0], type: it[1]]
                 }
                 reader.getDifficulties().each {row ->
-                    data << [c: [[v: row.name, f:"<a href='difficulty.html?name=${row.name}&length=${row.length}&table=wave'>${row.name}</a>", p: null], 
+                    data << [c: [[v: row.name, f:"<a href='difficulty.html?name=${row.name}&length=${row.length}'>${row.name}</a>", p: null], 
                         [v: row.length, f: null, p:[style: colStyle]],
                         [v: row.wins, f: null, p:[style: colStyle]],
                         [v: row.losses, f: null, p:[style: colStyle]],
@@ -89,6 +89,27 @@ public class DataJson implements Resource {
                     [v: totals["losses"], f: null],
                     [v: 0, f: "---"],
                     [v: totals["time"], f: Time.secToStr(totals["time"])],
+                ]]
+                break
+            case "difficultydata":
+                def totals= [wins: 0, losses: 0, time: 0]
+                columns= [["Name", "string"], ["Wins", "number"], ["Losses", "number"], ["Time", "number"]].collect {
+                    [label: it[0], type: it[1]]
+                }
+                reader.getDifficultyData(queryValues[Queries.name], queryValues[Queries.length]).each {row ->
+                    data << [c: [[v: row.name, f:"<a href='leveldata.html?table=leveldata&name=${row.name}'>${row.name}</a>", p: null], 
+                        [v: row.wins, f: null, p:[style: colStyle]],
+                        [v: row.losses, f: null, p:[style: colStyle]],
+                        [v: row.time, f: Time.secToStr(row.time), p:[style: colStyle]],
+                    ]]
+                    totals["wins"]+= row.wins
+                    totals["losses"]+= row.losses
+                    totals["time"]+= row.time.toInteger()
+                }
+                data << [c: [[v: "Totals", f:null, p: null], 
+                    [v: totals["wins"], f: null, p:[style: colStyle]],
+                    [v: totals["losses"], f: null, p:[style: colStyle]],
+                    [v: totals["time"], f: Time.secToStr(totals["time"]), p:[style: colStyle]],
                 ]]
                 break
             case "records":

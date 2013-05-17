@@ -8,32 +8,9 @@ public class IndexHtml implements Resource {
     protected static def jsFiles= ['//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js', 
             'https://www.google.com/jsapi?autoload={"modules":[{"name":"visualization","version":"1","packages":["controls"]}]}']
     protected static def stylesheets= ['http/css/kfstatsxHtml.css']
-    protected static def scrollingJs= """
-        //Div scrolling js taken from http://gazpo.com/2012/03/horizontal-content-scroll/
-        function goto(id){   
-            //animate to the div id.
-            \$(".contentbox-wrapper").animate({"left": -(\$(id).position().left)}, 600);
-        }
-    """
     protected static def jsChartCommon= """
         google.setOnLoadCallback(visualizationCallback);
 
-        function replaceHtml(html, divId) {
-            document.getElementById(divId).innerHTML= html;
-        }
-
-        function drawChart(data, title, divId, chartType) {
-            var chart= new google.visualization.ChartWrapper({'chartType': chartType, 'containerId': divId, 'options': {
-                'chartArea': {height: '90%'},
-                'vAxis': {textStyle: {fontSize: 15}},
-                'allowHtml': true
-            }});
-            chart.setDataTable(data);
-            chart.setOption('title', title);
-            chart.setOption('height', Math.max(chart.getDataTable().getNumberOfRows() * 25, document.getElementById(divId).offsetHeight * 0.975));
-            chart.setOption('width', document.getElementById(divId).offsetWidth * 0.985);
-            chart.draw();
-        }
         function visualizationCallback() {
 """
 
@@ -53,7 +30,15 @@ public class IndexHtml implements Resource {
                 chartCalls+= "            drawChart(${param[0]}, '${param[1]}', '${param[2]}', '${chartType}');\n"
             }
         }
-        return "$jsChartCommon$chartCalls        }\n    "
+        return """
+            ${WebCommon.replaceHtml}
+            ${WebCommon.chartJs}
+            google.setOnLoadCallback(visualizationCallback);
+
+            function visualizationCallback() {
+                $chartCalls
+            }
+        """
     }
 
     public String generatePage(DataReader reader, Map<String, String> queries) {
@@ -77,7 +62,7 @@ public class IndexHtml implements Resource {
                 jsFiles.each {filename ->
                     script(type:'text/javascript', src:filename, '')
                 }
-                script(type:'text/javascript', scrollingJs)
+                script(type:'text/javascript', WebCommon.scrollingJs)
 
                 def stndChartsParams= []
                 nav.each {navItem ->

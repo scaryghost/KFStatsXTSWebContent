@@ -31,4 +31,33 @@ public class WebCommon {
             [name: it[0], value: it[1]]
         }
     }
+
+    public static def chartJs= """
+        function drawChart(data, title, divId, chartType) {
+            var chart= new google.visualization.ChartWrapper({'chartType': chartType, 'containerId': divId, 'options': {
+                'chartArea': {height: '90%'},
+                'vAxis': {textStyle: {fontSize: 15}},
+                'allowHtml': true
+            }});
+            chart.setDataTable(data);
+            chart.setOption('title', title);
+            chart.setOption('height', Math.max(chart.getDataTable().getNumberOfRows() * 25, document.getElementById(divId).offsetHeight * 0.975));
+            chart.setOption('width', document.getElementById(divId).offsetWidth * 0.985);
+            chart.draw();
+        }
+    """
+
+    public static def replaceHtml= """
+        function replaceHtml(html, divId) {
+            document.getElementById(divId).innerHTML= html;
+        }
+    """
+
+    public static def scrollingJs= """
+        //Div scrolling js taken from http://gazpo.com/2012/03/horizontal-content-scroll/
+        function goto(id){   
+            //animate to the div id.
+            \$(".contentbox-wrapper").animate({"left": -(\$(id).position().left)}, 600);
+        }
+    """
 }

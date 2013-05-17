@@ -89,9 +89,13 @@ public class DifficultyHtml extends IndexHtml {
     protected String dashboardVisualization(def parameters) {
         def chartCalls= ""
         parameters.each {param ->
-            chartCalls+= "            drawDashboard(${param[0]}, '${param[1]}');\n"
+            if (param.size() == 2) {
+                chartCalls+= "            drawDashboard(${param[0]}, '${param[1]}');\n"
+            } else {
+                chartCalls+= "            drawChart(${param[0]}, '${param[1]}', '${param[2]}', 'Table')\n"
+            }
         }
-        return "$dasboardJs$chartCalls        }\n    "
+        return "${WebCommon.chartJs}\n$dasboardJs$chartCalls        }\n    "
     }
 
     public String generatePage(DataReader reader, Map<String, String> queries) {
@@ -113,12 +117,15 @@ public class DifficultyHtml extends IndexHtml {
                 jsFiles.each {filename ->
                     script(type:'text/javascript', src:filename, '')
                 }
-                script(type:'text/javascript', scrollingJs)
+                script(type:'text/javascript', WebCommon.scrollingJs)
                 def parameters= []
+                queries.table= "wave"
                 nav.each {item ->
                     queries.group= item
                     parameters << [dataJson.generatePage(reader, queries), item]
                 }
+                queries.table= "difficultydata"
+                parameters << [dataJson.generatePage(reader, queries), 'Summary', 'summary_div']
                 script(type: 'text/javascript') {
                     mkp.yieldUnescaped(dashboardVisualization(parameters))
                 }
@@ -128,12 +135,9 @@ public class DifficultyHtml extends IndexHtml {
                     div(id: 'nav') {
                         h3("Navigation") {
                             select(onchange:'goto(this.options[this.selectedIndex].value); return false') {
+                                option(value: "#summary_div", selected: "selected", 'Summary')
                                 nav.each {item ->
-                                    def attr= [value: "#${item}_dashboard_div"]
-                                    if (item == nav.first()) {
-                                        attr["selected"]= "selected"
-                                    }
-                                    option(attr, item)
+                                    option(value: "#${item}_dashboard_div", item)
                                 }
                             }
                         }
@@ -141,6 +145,7 @@ public class DifficultyHtml extends IndexHtml {
                     }
                     div(id:'content') {
                         div(class:'contentbox-wrapper') {
+                            div(id: 'summary_div', class: 'contentbox', '')
                             nav.each {item ->
                                 div(id: item + '_dashboard_div', class:'contentbox', '') {
                                     div(id: item + "_dashboard_filter1_div", '')
