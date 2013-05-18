@@ -12,14 +12,40 @@ public class RecordsHtml extends IndexHtml {
     protected RecordsHtml(def category) {
         super()
         this.category= category
+        drawNav= false
     }
 
-    protected String pagedTable(def queries) {
+    protected void fillVisualizationJS(def builder) {
         def ajaxQueries= ["table=$category"]
 
         queries.each {key, value ->
             ajaxQueries << "$key=$value"
         }
+        builder.script(type: 'text/javascript') {
+            mkp.yieldUnescaped(pagedTable(ajaxQueries))
+        }
+    }
+
+    protected void fillContentBoxes(def builder) {
+        builder.div(id:category + '_div_outer', class:'contentbox') {
+            form(action:'', 'Number of rows:') {
+                select(onchange:'updatePageSize(parseInt(this.value, 10))') {
+                    option(selected:"selected", value:'25', '25')
+                    option(value:'50', '50')
+                    option(value:'100', '100')
+                    option(value:'250', '250')
+                }
+            }
+            form(action:'profile.html', method:'get', style:'text-align:left') {
+                mkp.yieldUnescaped("Enter player's <a href='http://steamidconverter.com/' target='_blank'>steamID64: </a>")
+                input(type:'text', name:'steamid64')
+                input(type:'submit', value:'Search Player')
+            }
+            div(id: category + '_div', '')
+        }
+    }
+
+    protected String pagedTable(def ajaxQueries) {
         """
         var page= 0, pageSize= 25, group="none", order= "ASC";
         var data, chart;
@@ -85,55 +111,5 @@ public class RecordsHtml extends IndexHtml {
             chart.draw();
         }
   """
-    }
-
-    public String generatePage(DataReader reader, Map<String, String> queries) {
-        def writer= new StringWriter()
-        def htmlBuilder= new MarkupBuilder(writer)
-
-        htmlBuilder.html() {
-            htmlBuilder.head() {
-                meta('http-equiv':'content-type', content:'text/html; charset=utf-8')
-                title("KFStatsX")
-                
-                stylesheets.each {filename ->
-                    link(href: filename, rel:'stylesheet', type:'text/css')
-                }
-                link(rel:'shortcut icon', href: 'http/ico/favicon.ico')
-                
-                jsFiles.each {filename ->
-                    script(type:'text/javascript', src:filename, '')
-                }
-                script(type: 'text/javascript') {
-                    mkp.yieldUnescaped(pagedTable(queries))
-                }
-            }
-            body() {
-                div(id:'wrap') {
-                    div(id: 'nav', '')
-                    div(id:'content') {
-                        div(class:'contentbox-wrapper') {
-                            div(id:category + '_div_outer', class:'contentbox') {
-                                form(action:'', 'Number of rows:') {
-                                    select(onchange:'updatePageSize(parseInt(this.value, 10))') {
-                                        option(selected:"selected", value:'25', '25')
-                                        option(value:'50', '50')
-                                        option(value:'100', '100')
-                                        option(value:'250', '250')
-                                    }
-                                }
-                                form(action:'profile.html', method:'get', style:'text-align:left') {
-                                    mkp.yieldUnescaped("Enter player's <a href='http://steamidconverter.com/' target='_blank'>steamID64: </a>")
-                                    input(type:'text', name:'steamid64')
-                                    input(type:'submit', value:'Search Player')
-                                }
-                                div(id: category + '_div', '')
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return "<!DOCTYPE HTML>\n$writer"
     }
 }

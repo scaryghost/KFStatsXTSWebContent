@@ -5,6 +5,6 @@ public class ProfileHtml extends IndexHtml {
     public ProfileHtml() {
         super()
         htmlDiv << "profile"
-        nav= ["profile"]
+        navigation= ["profile"]
     }
 }

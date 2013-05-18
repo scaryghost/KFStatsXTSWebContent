@@ -2,10 +2,52 @@ import com.github.etsai.kfsxtrackingserver.DataReader
 import com.github.etsai.kfsxtrackingserver.web.Resource
 import groovy.xml.MarkupBuilder
 
-public class WaveDataHtml extends IndexHtml {
+public class WaveDataHtml extends WebPageBase {
+    private def includeSummary
+
     public WaveDataHtml() {
         super()
+        categoryMthd= "getWaveDataCategories"
     }
+
+    protected abstract fillNav(def builder) {
+        builder.select(onchange:'goto(this.options[this.selectedIndex].value); return false') {
+            if (includeSummary) {
+                option(value: "#summary_div", selected: "selected", 'Summary')
+            }
+            navigation.each {item ->
+                option(value: "#${item}_dashboard_div", item)
+            }
+        }
+    }
+    protected abstract fillVisualizationJS(def builder) {
+        def parameters= []
+        queries.table= "wave"
+        navigation.each {item ->
+            queries.group= item
+            parameters << [dataJson.generatePage(reader, queries), item]
+        }
+        if (includeSummary) {
+            queries.table= "difficultydata"
+            parameters << [dataJson.generatePage(reader, queries), 'Summary', 'summary_div']
+        }
+        script(type: 'text/javascript') {
+            mkp.yieldUnescaped(dashboardVisualization(parameters))
+        }
+    }
+    protected abstract fillContentBoxes(def builder) {
+        if (includeSummary) {
+            div(id: 'summary_div', class: 'contentbox', '')
+        }
+        navigation.each {item ->
+            div(id: item + '_dashboard_div', class:'contentbox', '') {
+                div(id: item + "_dashboard_filter1_div", '')
+                div(id: item + "_dashboard_filter2_div", '')
+                div(id: item + "_dashboard_chart_div", '')
+            }
+        }
+    }
+
     protected static def dasboardJs= """
         function drawDashboard(data, category) {
             var divName= category + "_dashboard";
@@ -96,74 +138,5 @@ public class WaveDataHtml extends IndexHtml {
             }
         }
         return "${WebCommon.chartJs}\n$dasboardJs$chartCalls        }\n    "
-    }
-
-    public String generatePage(DataReader reader, Map<String, String> queries) {
-        def writer= new StringWriter()
-        def htmlBuilder= new MarkupBuilder(writer)
-        def nav= reader.getWaveDataCategories()
-        def dataJson= new DataJson()
-
-        htmlBuilder.html() {
-            htmlBuilder.head() {
-                meta('http-equiv':'content-type', content:'text/html; charset=utf-8')
-                title("KFStatsX")
-
-                link(rel:'shortcut icon', href: 'http/ico/favicon.ico')
-                stylesheets.each {filename ->
-                    link(href: filename, rel:'stylesheet', type:'text/css')
-                }
-                
-                jsFiles.each {filename ->
-                    script(type:'text/javascript', src:filename, '')
-                }
-                script(type:'text/javascript', WebCommon.scrollingJs)
-                def parameters= []
-                queries.table= "wave"
-                nav.each {item ->
-                    queries.group= item
-                    parameters << [dataJson.generatePage(reader, queries), item]
-                }
-                if (queries.level == null) {
-                    queries.table= "difficultydata"
-                    parameters << [dataJson.generatePage(reader, queries), 'Summary', 'summary_div']
-                }
-                script(type: 'text/javascript') {
-                    mkp.yieldUnescaped(dashboardVisualization(parameters))
-                }
-            }
-            body() {
-                div(id:'wrap') {
-                    div(id: 'nav') {
-                        h3("Navigation") {
-                            select(onchange:'goto(this.options[this.selectedIndex].value); return false') {
-                                if (queries.level == null) {
-                                    option(value: "#summary_div", selected: "selected", 'Summary')
-                                }
-                                nav.each {item ->
-                                    option(value: "#${item}_dashboard_div", item)
-                                }
-                            }
-                        }
-                        
-                    }
-                    div(id:'content') {
-                        div(class:'contentbox-wrapper') {
-                            if (queries.level == null) {
-                                div(id: 'summary_div', class: 'contentbox', '')
-                            }
-                            nav.each {item ->
-                                div(id: item + '_dashboard_div', class:'contentbox', '') {
-                                    div(id: item + "_dashboard_filter1_div", '')
-                                    div(id: item + "_dashboard_filter2_div", '')
-                                    div(id: item + "_dashboard_chart_div", '')
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return "<!DOCTYPE HTML>\n$writer"
     }
 }

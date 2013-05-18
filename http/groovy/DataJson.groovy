@@ -132,7 +132,7 @@ public class DataJson implements Resource {
                 }
                 WebCommon.partialQuery(reader, queryValues, false).each {row ->
                     data << [c: [[v: row.level, f:null, p: null], 
-                        [v: row.name, f: null, p:[style: colStyle]],
+                        [v: row.difficulty, f: null, p:[style: colStyle]],
                         [v: row.length, f: null, p:[style: colStyle]],
                         [v: row.result, f: null, p:[style: colStyle]],
                         [v: row.wave, f: null, p:[style: colStyle]],
