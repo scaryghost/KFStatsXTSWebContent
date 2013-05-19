@@ -39,9 +39,7 @@ public class IndexHtml extends WebPageBase {
         }
     }
     protected void fillContentBoxes(def builder) {
-        builder.div(id: 'dialog', title:'Basic dialog') {
-            p("This is an animated dialog which is useful for displaying information. The dialog window can be moved, resized and closed with the 'x' icon.")
-        }
+        builder.div(id: 'dialog', title:'Levels', '')
         navigation.each {item ->
             builder.div(id: item + '_div', class:'contentbox', '')
         }
@@ -61,18 +59,13 @@ public class IndexHtml extends WebPageBase {
             \$(function() {
                 \$( "#dialog" ).dialog({
                     autoOpen: false,
-                    show: {
-                        effect: "blind",
-                        duration: 1000
-                    },
-                    hide: {
-                        effect: "explode",
-                        duration: 1000
-                    },
-                    modal: true
+                    position: {at: "left+15% top+15%"},
+                    modal: true,
+                    width: document.getElementById('levels_div').offsetWidth * 0.985
                 });
             });
             function open(map) {
+                \$( "#dialog" ).dialog( "option", "title", map );
                 \$( "#dialog" ).dialog( "open" );
                 var data= \$.ajax({url: "data.json?table=leveldata&name=" + map, dataType:"json", async: false}).responseText;
                 drawChart(data, 'Difficulties', 'dialog', 'Table');
