@@ -2,7 +2,7 @@ import com.github.etsai.kfsxtrackingserver.DataReader
 import com.github.etsai.kfsxtrackingserver.web.Resource
 import groovy.xml.MarkupBuilder
 
-public class RecordsHtml extends IndexHtml {
+public class RecordsHtml extends WebPageBase {
     protected final def category
 
     public RecordsHtml() {
@@ -13,6 +13,9 @@ public class RecordsHtml extends IndexHtml {
         super()
         this.category= category
         drawNav= false
+    }
+
+    protected void fillNav(def builder) {
     }
 
     protected void fillVisualizationJS(def builder) {

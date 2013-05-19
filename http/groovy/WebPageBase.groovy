@@ -48,7 +48,7 @@ public abstract class WebPageBase implements Resource {
             }
             body() {
                 div(id:'wrap') {
-                    div(id: 'nav') {
+                    div(id: 'nav','') {
                         if (drawNav) {
                             h3("Navigation") {
                                 fillNav(htmlBuilder)

@@ -59,7 +59,7 @@ public class IndexHtml extends WebPageBase {
             \$(function() {
                 \$( "#dialog" ).dialog({
                     autoOpen: false,
-                    position: {at: "left+15% top+15%"},
+                    position: {my: "left+15%", at: "left top+15%"},
                     modal: true,
                     width: document.getElementById('levels_div').offsetWidth * 0.985
                 });
