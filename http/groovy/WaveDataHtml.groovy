@@ -3,16 +3,14 @@ import com.github.etsai.kfsxtrackingserver.web.Resource
 import groovy.xml.MarkupBuilder
 
 public class WaveDataHtml extends WebPageBase {
-    private def includeSummary
-
     public WaveDataHtml() {
         super()
         categoryMthd= "getWaveDataCategories"
     }
 
-    protected abstract fillNav(def builder) {
+    protected void fillNav(def builder) {
         builder.select(onchange:'goto(this.options[this.selectedIndex].value); return false') {
-            if (includeSummary) {
+            if (queries.level == null) {
                 option(value: "#summary_div", selected: "selected", 'Summary')
             }
             navigation.each {item ->
@@ -20,27 +18,27 @@ public class WaveDataHtml extends WebPageBase {
             }
         }
     }
-    protected abstract fillVisualizationJS(def builder) {
+    protected void fillVisualizationJS(def builder) {
         def parameters= []
         queries.table= "wave"
         navigation.each {item ->
             queries.group= item
             parameters << [dataJson.generatePage(reader, queries), item]
         }
-        if (includeSummary) {
+        if (queries.level == null) {
             queries.table= "difficultydata"
             parameters << [dataJson.generatePage(reader, queries), 'Summary', 'summary_div']
         }
-        script(type: 'text/javascript') {
+        builder.script(type: 'text/javascript') {
             mkp.yieldUnescaped(dashboardVisualization(parameters))
         }
     }
-    protected abstract fillContentBoxes(def builder) {
-        if (includeSummary) {
-            div(id: 'summary_div', class: 'contentbox', '')
+    protected void fillContentBoxes(def builder) {
+        if (queries.level == null) {
+            builder.div(id: 'summary_div', class: 'contentbox', '')
         }
         navigation.each {item ->
-            div(id: item + '_dashboard_div', class:'contentbox', '') {
+            builder.div(id: item + '_dashboard_div', class:'contentbox', '') {
                 div(id: item + "_dashboard_filter1_div", '')
                 div(id: item + "_dashboard_filter2_div", '')
                 div(id: item + "_dashboard_chart_div", '')
@@ -51,7 +49,7 @@ public class WaveDataHtml extends WebPageBase {
     protected static def dasboardJs= """
         function drawDashboard(data, category) {
             var divName= category + "_dashboard";
-            var dashboard=  new google.visualization.Dashboard(document.getElementById(divName + '_div'))
+            var dashboard= new google.visualization.Dashboard(document.getElementById(divName + '_div'))
             var dataTable= new google.visualization.DataTable(data);
 
             var columnsTable = new google.visualization.DataTable();

@@ -5,8 +5,8 @@ import groovy.xml.MarkupBuilder
 public abstract class WebPageBase implements Resource {
     protected def drawNav
     protected def htmlDiv, navigation, categoryMthd, dataHtml, dataJson, queries, reader
-    protected static def stylesheets= ['http/css/kfstatsxHtml.css']
-    protected static def jsFiles= ['//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js', 
+    protected static def stylesheets= ['http/css/kfstatsxHtml.css', 'http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css']
+    protected static def jsFiles= ['//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js', 'http://code.jquery.com/ui/1.10.3/jquery-ui.js',
             'https://www.google.com/jsapi?autoload={"modules":[{"name":"visualization","version":"1","packages":["controls"]}]}']
 
     public WebPageBase() {
@@ -14,6 +14,7 @@ public abstract class WebPageBase implements Resource {
         dataHtml= new DataHtml()
         dataJson= new DataJson()
         drawNav= true
+        navigation= []
     }
 
     protected abstract void fillNav(def builder)
@@ -58,6 +59,9 @@ public abstract class WebPageBase implements Resource {
                         div(class:'contentbox-wrapper') {
                             fillContentBoxes(htmlBuilder)
                         }
+                    }
+                    div(id:"footer") {
+                        a(id:'opener', href:'javascript:void(0)', 'Click me')
                     }
                 }
             }

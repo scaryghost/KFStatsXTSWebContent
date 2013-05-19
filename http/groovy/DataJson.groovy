@@ -54,7 +54,7 @@ public class DataJson implements Resource {
                     [label: it[0], type: it[1]]
                 }
                 reader.getLevels().each {row ->
-                    data << [c: [[v: row.name, f:"<a href='leveldata.html?table=leveldata&name=${row.name}'>${row.name}</a>", p: null], 
+                    data << [c: [[v: row.name, f:"<a id='opener' href='javascript:open(\"${row.name}\")'>${row.name}</a>", p: null], 
                         [v: row.wins, f: null, p:[style: colStyle]],
                         [v: row.losses, f: null, p:[style: colStyle]],
                         [v: row.time, f: Time.secToStr(row.time), p:[style: colStyle]],

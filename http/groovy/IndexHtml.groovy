@@ -39,6 +39,9 @@ public class IndexHtml extends WebPageBase {
         }
     }
     protected void fillContentBoxes(def builder) {
+        builder.div(id: 'dialog', title:'Basic dialog') {
+            p("This is an animated dialog which is useful for displaying information. The dialog window can be moved, resized and closed with the 'x' icon.")
+        }
         navigation.each {item ->
             builder.div(id: item + '_div', class:'contentbox', '')
         }
@@ -54,7 +57,26 @@ public class IndexHtml extends WebPageBase {
                 chartCalls+= "            drawChart(${param[0]}, '${param[1]}', '${param[2]}', '${chartType}');\n"
             }
         }
-        return """
+        return """ 
+            \$(function() {
+                \$( "#dialog" ).dialog({
+                    autoOpen: false,
+                    show: {
+                        effect: "blind",
+                        duration: 1000
+                    },
+                    hide: {
+                        effect: "explode",
+                        duration: 1000
+                    },
+                    modal: true
+                });
+            });
+            function open(map) {
+                \$( "#dialog" ).dialog( "open" );
+                var data= \$.ajax({url: "data.json?table=leveldata&name=" + map, dataType:"json", async: false}).responseText;
+                drawChart(data, 'Difficulties', 'dialog', 'Table');
+            }
             ${WebCommon.replaceHtml}
             ${WebCommon.chartJs}
             google.setOnLoadCallback(visualizationCallback);
