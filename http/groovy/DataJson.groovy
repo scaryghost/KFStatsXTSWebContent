@@ -69,6 +69,29 @@ public class DataJson implements Resource {
                     [v: totals["time"], f: Time.secToStr(totals["time"]), p:[style: colStyle]],
                 ]]
                 break
+            case "leveldata":
+                def totals= [wins: 0, losses: 0, time: 0]
+                columns= [["Difficulty", "string"], ["Length", "string"], ["Wins", "number"], ["Losses", "number"], ["Avg Wave", "number"], ["Time", "number"]].collect {
+                    [label: it[0], type: it[1]]
+                }
+                reader.getLevelData(queryValues[Queries.name]).each {row ->
+                    def avgWave= row.waveaccum / (row.wins + row.losses)
+                    data << [c: [[v: row.name, f:"<a href='wavedata.html?name=${row.name}&length=${row.length}&level=${queryValues[Queries.name]}' style='color:#0073BF'>${row.name}</a>"], 
+                            [v:row.length], [v: row.wins], [v: row.losses], [v:avgWave, f: String.format("%.2f",avgWave)], 
+                            [v:row.time, f: Time.secToStr(row.time)]
+                    ]]
+                    totals.wins+= row.wins
+                    totals.losses+= row.losses
+                    totals.time+= row.time
+                }
+                data << [c: [[v: "Totals"], 
+                    [v: "", f: "---"],
+                    [v: totals["wins"]],
+                    [v: totals["losses"]],
+                    [v: 0, f: "---"],
+                    [v: totals["time"], f: Time.secToStr(totals["time"])],
+                ]]
+                break
             case "difficultydata":
                 def totals= [wins: 0, losses: 0, time: 0]
                 columns= [["Name", "string"], ["Wins", "number"], ["Losses", "number"], ["Time", "number"]].collect {
