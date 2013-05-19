@@ -7,14 +7,15 @@ public class WaveDataHtml extends WebPageBase {
         super()
         categoryMthd= "getWaveDataCategories"
     }
-
-    protected void fillNav(def builder) {
-        builder.select(onchange:'goto(this.options[this.selectedIndex].value); return false') {
-            if (queries.level == null) {
-                option(value: "#summary_div", selected: "selected", 'Summary')
-            }
-            navigation.each {item ->
-                option(value: "#${item}_dashboard_div", item)
+    protected void fillHeader(def builder) {
+        builder.h3("Navigation") {
+            select(onchange:'goto(this.options[this.selectedIndex].value); return false') {
+                if (queries.level == null) {
+                    option(value: "#summary_div", selected: "selected", 'Summary')
+                }
+                navigation.each {item ->
+                    option(value: "#${item}_dashboard_div", item)
+                }
             }
         }
     }

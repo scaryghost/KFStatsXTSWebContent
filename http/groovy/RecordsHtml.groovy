@@ -12,10 +12,10 @@ public class RecordsHtml extends WebPageBase {
     protected RecordsHtml(def category) {
         super()
         this.category= category
-        drawNav= false
     }
 
-    protected void fillNav(def builder) {
+    protected void fillHeader(def builder) {
+        builder.h3("Player Records")
     }
 
     protected void fillVisualizationJS(def builder) {

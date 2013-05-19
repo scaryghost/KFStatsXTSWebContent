@@ -11,14 +11,16 @@ public class IndexHtml extends WebPageBase {
         categoryMthd= "getAggregateCategories"
     }
 
-    protected void fillNav(def builder) {
-        builder.select(onchange:'goto(this.options[this.selectedIndex].value); return false') {
-            navigation.each {item ->
-                def attr= [value: "#${item}_div"]
-                if (item == navigation.first()) {
-                    attr["selected"]= "selected"
+    protected void fillHeader(def builder) {
+        builder.h3("Navigation") {
+            select(onchange:'goto(this.options[this.selectedIndex].value); return false') {
+                navigation.each {item ->
+                    def attr= [value: "#${item}_div"]
+                    if (item == navigation.first()) {
+                        attr["selected"]= "selected"
+                    }
+                    option(attr, item)
                 }
-                option(attr, item)
             }
         }
     }

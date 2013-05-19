@@ -6,4 +6,7 @@ public class SessionsHtml extends RecordsHtml {
     public SessionsHtml() {
         super("sessions")
     }
+    protected void fillHeader(def builder) {
+        builder.h3("Match History")
+    }
 }

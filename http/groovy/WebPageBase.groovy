@@ -3,7 +3,6 @@ import com.github.etsai.kfsxtrackingserver.web.Resource
 import groovy.xml.MarkupBuilder
 
 public abstract class WebPageBase implements Resource {
-    protected def drawNav
     protected def htmlDiv, navigation, categoryMthd, dataHtml, dataJson, queries, reader
     protected static def stylesheets= ['http/css/kfstatsxHtml.css', 'http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css']
     protected static def jsFiles= ['//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js', 'http://code.jquery.com/ui/1.10.3/jquery-ui.js',
@@ -13,11 +12,10 @@ public abstract class WebPageBase implements Resource {
         htmlDiv= new HashSet()
         dataHtml= new DataHtml()
         dataJson= new DataJson()
-        drawNav= true
         navigation= []
     }
 
-    protected abstract void fillNav(def builder)
+    protected abstract void fillHeader(def builder)
     protected abstract void fillVisualizationJS(def builder)
     protected abstract void fillContentBoxes(def builder)
 
@@ -48,12 +46,8 @@ public abstract class WebPageBase implements Resource {
             }
             body() {
                 div(id:'wrap') {
-                    div(id: 'nav','') {
-                        if (drawNav) {
-                            h3("Navigation") {
-                                fillNav(htmlBuilder)
-                            }
-                        }
+                    div(id: 'header','') {
+                        fillHeader(htmlBuilder)
                     }
                     div(id:'content') {
                         div(class:'contentbox-wrapper') {
