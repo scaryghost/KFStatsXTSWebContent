@@ -171,7 +171,7 @@ public class DataJson implements Resource {
                 def query, psValues
                 def results
 
-                columns= [["Stat", "string"], ["Count", "number"]].collect {
+                columns= [[queryValues[Queries.table].capitalize(), "string"], ["Count", "number"]].collect {
                     [label: it[0], type: it[1]]
                 }
                 if (queryValues[Queries.steamid64] == null) {

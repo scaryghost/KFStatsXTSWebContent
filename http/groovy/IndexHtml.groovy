@@ -22,7 +22,7 @@ public class IndexHtml extends WebPageBase {
                     if (item == navigation.first()) {
                         attr["selected"]= "selected"
                     }
-                    option(attr, item)
+                    option(attr, item.capitalize())
                 }
             }
         }
@@ -67,32 +67,32 @@ public class IndexHtml extends WebPageBase {
             } else if (chartTypes[param[1]] == null) {
                 chartCalls+= "            drawChart(${param[0]}, '${param[1]}', '${param[2]}', '${chartType}');\n"
             } else {
-                chartCalls+= "            drawFilteredChart(${param[0]}, '${param[1]}', '${param[2]}', '${chartType}');\n"
+                chartCalls+= "            drawFilteredChart(${param[0]}, '${param[1].capitalize()}', '${param[2]}', '${chartType}');\n"
             }
         }
         return """ 
-            \$(function() {
-                \$( "#dialog" ).dialog({
-                    autoOpen: false,
-                    position: {my: "left+15%", at: "left top+15%"},
-                    modal: true,
-                    width: document.getElementById('levels_div').offsetWidth * 0.985
-                });
+        \$(function() {
+            \$( "#dialog" ).dialog({
+                autoOpen: false,
+                position: {my: "left+15%", at: "left top+15%"},
+                modal: true,
+                width: document.getElementById('levels_div').offsetWidth * 0.985
             });
-            function open(map) {
-                \$( "#dialog" ).dialog( "option", "title", map );
-                \$( "#dialog" ).dialog( "open" );
-                var data= \$.ajax({url: "data.json?table=leveldata&name=" + map, dataType:"json", async: false}).responseText;
-                drawChart(data, 'Difficulties', 'dialog', 'Table');
-            }
+        });
+        function open(map) {
+            \$( "#dialog" ).dialog( "option", "title", map );
+            \$( "#dialog" ).dialog( "open" );
+            var data= \$.ajax({url: "data.json?table=leveldata&name=" + map, dataType:"json", async: false}).responseText;
+            drawChart(data, 'Difficulties', 'dialog', 'Table');
+        }
             ${WebCommon.filterChartJs}
             ${WebCommon.replaceHtml}
             ${WebCommon.chartJs}
-            google.setOnLoadCallback(visualizationCallback);
+        google.setOnLoadCallback(visualizationCallback);
 
-            function visualizationCallback() {
-                $chartCalls
-            }
+        function visualizationCallback() {
+$chartCalls
+        }
         """
     }
 
