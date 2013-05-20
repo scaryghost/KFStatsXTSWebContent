@@ -14,6 +14,10 @@ public class RecordsHtml extends WebPageBase {
         this.category= category
     }
 
+    public String getPageTitle() {
+        return "${super.getPageTitle()} - Player Records"
+    }
+
     protected void fillHeader(def builder) {
         builder.h3("Player Records")
     }

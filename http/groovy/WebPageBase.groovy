@@ -4,8 +4,8 @@ import groovy.xml.MarkupBuilder
 
 public abstract class WebPageBase implements Resource {
     protected def htmlDiv, navigation, categoryMthd, dataHtml, dataJson, queries, reader
-    protected static def stylesheets= ['http/css/kfstatsxHtml.css', 'http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css']
-    protected static def jsFiles= ['//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js', 'http://code.jquery.com/ui/1.10.3/jquery-ui.js',
+    protected def stylesheets= ['http/css/kfstatsxHtml.css']
+    protected def jsFiles= ['//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js',
             'https://www.google.com/jsapi?autoload={"modules":[{"name":"visualization","version":"1","packages":["controls"]}]}']
 
     public WebPageBase() {
@@ -15,6 +15,9 @@ public abstract class WebPageBase implements Resource {
         navigation= []
     }
 
+    public String getPageTitle() {
+        return "KFStatsX"
+    }
     protected abstract void fillHeader(def builder)
     protected abstract void fillVisualizationJS(def builder)
     protected abstract void fillContentBoxes(def builder)
@@ -31,7 +34,7 @@ public abstract class WebPageBase implements Resource {
         htmlBuilder.html() {
             htmlBuilder.head() {
                 meta('http-equiv':'content-type', content:'text/html; charset=utf-8')
-                title("KFStatsX")
+                title(getPageTitle())
                 
                 stylesheets.each {filename ->
                     link(href: filename, rel:'stylesheet', type:'text/css')
@@ -60,6 +63,6 @@ public abstract class WebPageBase implements Resource {
                 }
             }
         }
-        return "<!DOCTYPE HTML>\n$writer"
+        return String.format("<!DOCTYPE HTML>%n%s", writer)
     }
 }

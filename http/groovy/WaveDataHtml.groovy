@@ -7,6 +7,10 @@ public class WaveDataHtml extends WebPageBase {
         super()
         categoryMthd= "getWaveDataCategories"
     }
+    public String getPageTitle() {
+        return "${super.getPageTitle()} - Wave Data"
+    }
+
     protected void fillHeader(def builder) {
         builder.h3("Navigation") {
             select(onchange:'goto(this.options[this.selectedIndex].value); return false') {

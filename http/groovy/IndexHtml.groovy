@@ -9,6 +9,8 @@ public class IndexHtml extends WebPageBase {
         htmlDiv << "totals"
         navigation= ["totals", "difficulties", "levels"]
         categoryMthd= "getAggregateCategories"
+        stylesheets << 'http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css'
+        jsFiles << 'http://code.jquery.com/ui/1.10.3/jquery-ui.js'
     }
 
     protected void fillHeader(def builder) {

@@ -31,6 +31,11 @@ public class DataHtml implements Resource {
                                     td(attr['value'])
                                 }
                             }
+                            tr() {
+                                td(colspan: "2") {
+                                    a(href: "records.html", "View players")
+                                }
+                            }
                         }
                     }
                 }
