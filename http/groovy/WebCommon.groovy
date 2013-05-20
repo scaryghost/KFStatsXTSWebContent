@@ -32,6 +32,30 @@ public class WebCommon {
         }
     }
 
+    public static def filterChartJs= """
+        function drawFilteredChart(data, title, divId, chartType) {
+            var datatable= new google.visualization.DataTable(data);
+            var dashboard= new google.visualization.Dashboard(document.getElementById(divId + '_dashboard_div'));
+            var donutRangeSlider = new google.visualization.ControlWrapper({
+                'controlType': 'CategoryFilter',
+                'containerId': divId+'_filter_div',
+                'options': {
+                    'filterColumnIndex': 0
+                }
+            });
+            var chart= new google.visualization.ChartWrapper({'chartType': chartType, 'containerId': divId+"_chart_div", 'options': {
+                'chartArea': {height: '90%'},
+                'vAxis': {textStyle: {fontSize: 15}},
+                'allowHtml': true,
+                'title': title,
+                'height': Math.max(datatable.getNumberOfRows() * 25, document.getElementById(divId+"_dashboard_div").offsetHeight * 0.925),
+                'width': document.getElementById(divId+"_dashboard_div").offsetWidth * 0.985
+            }});
+            dashboard.bind(donutRangeSlider, chart);
+            dashboard.draw(datatable);
+        }
+
+    """
     public static def chartJs= """
         function drawChart(data, title, divId, chartType) {
             var chart= new google.visualization.ChartWrapper({'chartType': chartType, 'containerId': divId, 'options': {

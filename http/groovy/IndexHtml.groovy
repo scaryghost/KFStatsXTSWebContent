@@ -17,7 +17,8 @@ public class IndexHtml extends WebPageBase {
         builder.h3("Navigation") {
             select(onchange:'goto(this.options[this.selectedIndex].value); return false') {
                 navigation.each {item ->
-                    def attr= [value: "#${item}_div"]
+                    def divName= chartTypes[item] == null ? "#${item}_div" : "#${item}_dashboard_div" 
+                    def attr= [value: divName]
                     if (item == navigation.first()) {
                         attr["selected"]= "selected"
                     }
@@ -31,11 +32,12 @@ public class IndexHtml extends WebPageBase {
         def stndChartsParams= []
 
         navigation.each {navItem ->
+            def divName= chartTypes[navItem] == null ? "${navItem}_div" : navItem
             queries.table= navItem
             if (htmlDiv.contains(navItem)) {
-                stndChartsParams << [dataHtml.generatePage(reader, queries), null, "${navItem}_div", null]
+                stndChartsParams << [dataHtml.generatePage(reader, queries), null, divName, null]
             } else {
-                stndChartsParams << [dataJson.generatePage(reader, queries), navItem, "${navItem}_div", chartTypes[navItem]]
+                stndChartsParams << [dataJson.generatePage(reader, queries), navItem, divName, chartTypes[navItem]]
             }
         }
         builder.script(type: 'text/javascript') {
@@ -45,7 +47,14 @@ public class IndexHtml extends WebPageBase {
     protected void fillContentBoxes(def builder) {
         builder.div(id: 'dialog', title:'Levels', '')
         navigation.each {item ->
-            builder.div(id: item + '_div', class:'contentbox', '')
+            if (chartTypes[item] == null) {
+                builder.div(id: item + "_div", class:'contentbox', '') 
+            } else {
+                builder.div(id: item + '_dashboard_div', class:'contentbox') {
+                    div(id: item + '_filter_div', '')
+                    div(id: item + '_chart_div', '')
+                }
+            }
         }
     }
 
@@ -55,8 +64,10 @@ public class IndexHtml extends WebPageBase {
             def chartType= param[3] == null ? 'Table' : param[3]
             if (param[1] == null) {
                 chartCalls+= "            replaceHtml(\"${param[0]}\", '${param[2]}');\n"
-            } else {
+            } else if (chartTypes[param[1]] == null) {
                 chartCalls+= "            drawChart(${param[0]}, '${param[1]}', '${param[2]}', '${chartType}');\n"
+            } else {
+                chartCalls+= "            drawFilteredChart(${param[0]}, '${param[1]}', '${param[2]}', '${chartType}');\n"
             }
         }
         return """ 
@@ -74,6 +85,7 @@ public class IndexHtml extends WebPageBase {
                 var data= \$.ajax({url: "data.json?table=leveldata&name=" + map, dataType:"json", async: false}).responseText;
                 drawChart(data, 'Difficulties', 'dialog', 'Table');
             }
+            ${WebCommon.filterChartJs}
             ${WebCommon.replaceHtml}
             ${WebCommon.chartJs}
             google.setOnLoadCallback(visualizationCallback);
