@@ -1,5 +1,6 @@
 import com.github.etsai.kfsxtrackingserver.DataReader
 import com.github.etsai.kfsxtrackingserver.web.Resource
+import com.github.etsai.utils.Time
 
 public class IndexHtml extends WebPageBase {
     protected def chartTypes= [deaths: 'BarChart', perks: 'PieChart', weapons: 'BarChart', kills: 'BarChart']
@@ -94,6 +95,85 @@ public class IndexHtml extends WebPageBase {
 $chartCalls
         }
         """
+    }
+
+    protected String toXml(def builder) {
+        builder.kfstatsx() {
+            builder.'stats'(category:"totals") {
+                WebCommon.generateSummary(reader).each {attr ->
+                    'entry'(attr)
+                }
+            }
+            
+            builder.'stats'(category:"difficulties") {
+                def accum= [wins: 0, losses: 0, time: 0]
+                reader.getDifficulties().each {row ->
+                    def result= row
+                    accum.keySet().each {key ->
+                        accum[key]+= row[key]
+                    }
+
+                    result["avg-wave"]= String.format("%.2f", result.waveaccum / (row.wins + row.losses))
+                    result["formatted-time"]= Time.secToStr(row.time)
+                    result.remove("id")
+                    result.remove("waveaccum")
+                    'entry'(result)
+                }
+                
+                accum.name= "Total"
+                accum.length= ""
+                accum["avg-wave"]= ""
+                accum["formatted-time"]= Time.secToStr(accum.time)
+                total(accum)
+            }
+            builder.'stats'(category:"levels") {
+                def accum= [wins: 0, losses: 0, time: 0]
+                reader.getLevels().each {row ->
+                    def result= row
+                    accum.keySet().each {key ->
+                        accum[key]+= row[key]
+                    }
+                    
+                    result["formatted-time"]= Time.secToStr(result.time)
+                    result.remove("id")
+                    'entry'(result) {
+                        reader.getLevelData(result.name).each {difficulty ->
+                            accum.keySet().each {key ->
+                                accum[key]+= row[key]
+                            }
+
+                            difficulty["avg-wave"]= String.format("%.2f", difficulty.waveaccum / (row.wins + row.losses))
+                            difficulty["formatted-time"]= Time.secToStr(row.time)
+                            difficulty.remove("id")
+                            difficulty.remove("waveaccum")
+                            difficulty.remove("difficulty_id")
+                            difficulty.remove("level_id")
+                            builder.'difficulty'(difficulty)
+                        }
+                    }
+                }
+                accum.name= "Total"
+                accum["formatted-time"]= Time.secToStr(accum.time)
+                'total'(accum)
+            }
+            reader.getAggregateCategories().each {category ->
+                builder.'stats'(category: category) {
+                    reader.getAggregateData(category).each {row2 ->
+                        def key, val
+                        def attrs= [:]
+                        attrs["name"]= row2.stat
+                        attrs["value"]= row2.value
+
+                        if (category == "perks") {
+                            attrs["formatted"]= Time.secToStr(attrs["value"])
+                        } else if (attrs["name"].toLowerCase().contains("time")) {
+                            attrs["formatted"]= Time.secToStr(attrs["value"])
+                        }
+                        'entry'(attrs)
+                    }
+                }
+            }
+        }
     }
 
 }

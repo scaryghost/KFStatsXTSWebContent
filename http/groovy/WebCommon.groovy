@@ -77,11 +77,4 @@ public class WebCommon {
         }
     """
 
-    public static def scrollingJs= """
-        //Div scrolling js taken from http://gazpo.com/2012/03/horizontal-content-scroll/
-        function goto(id){   
-            //animate to the div id.
-            \$(".contentbox-wrapper").animate({"left": -(\$(id).position().left)}, 600);
-        }
-    """
 }

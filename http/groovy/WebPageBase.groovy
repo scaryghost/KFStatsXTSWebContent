@@ -3,6 +3,22 @@ import com.github.etsai.kfsxtrackingserver.web.Resource
 import groovy.xml.MarkupBuilder
 
 public abstract class WebPageBase implements Resource {
+    public static def defaultJs= """
+        //Div scrolling js taken from http://gazpo.com/2012/03/horizontal-content-scroll/
+        function goto(id){   
+            //animate to the div id.
+            \$(".contentbox-wrapper").animate({"left": -(\$(id).position().left)}, 600);
+        }
+
+        function getXml() {
+            if (window.location.search != "") {
+                window.location.href= window.location.href + "&xml=1";
+            } else {
+                window.location.href= window.location.href + "?xml=1";
+            }
+        }
+    """
+
     protected def htmlDiv, navigation, categoryMthd, dataHtml, dataJson, queries, reader
     protected def stylesheets= ['http/css/kfstatsxHtml.css']
     protected def jsFiles= ['//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js',
@@ -18,6 +34,7 @@ public abstract class WebPageBase implements Resource {
     public String getPageTitle() {
         return "KFStatsX"
     }
+    protected abstract String toXml(def builder)
     protected abstract void fillHeader(def builder)
     protected abstract void fillVisualizationJS(def builder)
     protected abstract void fillContentBoxes(def builder)
@@ -28,6 +45,10 @@ public abstract class WebPageBase implements Resource {
         this.queries= queries
         this.reader= reader
 
+        if (queries.xml != null) {
+            toXml(htmlBuilder)
+            return writer
+        }
         if (categoryMthd != null) {
             navigation= navigation.plus(reader.class.getDeclaredMethod(categoryMthd).invoke(reader))
         }
@@ -44,7 +65,9 @@ public abstract class WebPageBase implements Resource {
                 jsFiles.each {filename ->
                     script(type:'text/javascript', src:filename, '')
                 }
-                script(type:'text/javascript', WebCommon.scrollingJs)
+                script(type:'text/javascript') {
+                    mkp.yieldUnescaped(defaultJs)
+                }
                 fillVisualizationJS(htmlBuilder)
             }
             body() {
@@ -58,7 +81,7 @@ public abstract class WebPageBase implements Resource {
                         }
                     }
                     div(id:"footer") {
-                        a(id:'opener', href:'javascript:void(0)', 'Click me')
+                        a(id:'opener', href:'javascript:void(0)', onClick:'javascript:getXml()','View as xml')
                     }
                 }
             }
