@@ -158,18 +158,14 @@ $chartCalls
             }
             reader.getAggregateCategories().each {category ->
                 builder.'stats'(category: category) {
-                    reader.getAggregateData(category).each {row2 ->
-                        def key, val
-                        def attrs= [:]
-                        attrs["name"]= row2.stat
-                        attrs["value"]= row2.value
-
-                        if (category == "perks") {
-                            attrs["formatted"]= Time.secToStr(attrs["value"])
-                        } else if (attrs["name"].toLowerCase().contains("time")) {
-                            attrs["formatted"]= Time.secToStr(attrs["value"])
+                    reader.getAggregateData(category).each {row ->
+                        def attr= row
+                        if (category == "perks" || attr.stat.toLowerCase().contains("time")) {
+                            attr["formatted"]= Time.secToStr(attr["value"])
                         }
-                        'entry'(attrs)
+                        attr.remove("record_id")
+                        attr.remove("category")
+                        'entry'(attr)
                     }
                 }
             }

@@ -1,5 +1,6 @@
 import com.github.etsai.kfsxtrackingserver.DataReader
 import com.github.etsai.kfsxtrackingserver.web.Resource
+import com.github.etsai.utils.Time
 import groovy.xml.MarkupBuilder
 
 public class WaveDataHtml extends WebPageBase {
@@ -141,5 +142,46 @@ public class WaveDataHtml extends WebPageBase {
             }
         }
         return "${WebCommon.chartJs}\n$dasboardJs$chartCalls        }\n    "
+    }
+
+    protected String toXml(def builder) {
+        builder.kfstatsx() {
+            def attrs= queries.clone()
+            attrs.remove('xml')
+            builder.'wave-data'(attrs) {
+                if (queries.level == null) {
+                    'stats'(category: 'summary') {
+                        reader.getDifficultyData(queries.name, queries.length).each {row ->
+                            row.remove('difficulty_id')
+                            row.remove('level_id')
+
+                            row["formatted-time"]= Time.secToStr(row.time)
+                            'entry'(row)
+                        }
+                    }
+                }
+                reader.getWaveDataCategories().each {category ->
+                    builder.'stats'(category: category) {
+                        def waves= [:]
+                        def rows= queries.level == null ? reader.getWaveData(queries.name, queries.length, category) : 
+                            reader.getWaveData(queries.level, queries.name, queries.length, category)
+                        rows.each {row ->
+                            if (waves[row.wave] == null) {
+                                waves[row.wave]= []
+                            }
+                            waves[row.wave] << row
+                        }
+                        waves.each {wave, stats ->
+                            builder.'wave'(num: wave) {
+                                stats.each {stat ->
+                                    stat.remove('wave')
+                                    'entry'(stat)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
