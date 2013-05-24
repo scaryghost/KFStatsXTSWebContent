@@ -12,10 +12,10 @@ import groovy.xml.MarkupBuilder
  * Generates the html data for the page data.html
  * @author etsai
  */
-public class DataHtml implements Resource {
+public class DataHtml extends Resource {
     private static def tableAttr= [class: "content-table"]
     
-    public String generatePage(DataReader reader, Map<String, String> queries) {
+    public String generatePage() {
         def writer= new StringWriter()
         def xml= new MarkupBuilder(new IndentPrinter(new PrintWriter(writer), "", false))
         def queryValues= Queries.parseQuery(queries)
@@ -45,9 +45,7 @@ public class DataHtml implements Resource {
                 def row= reader.getRecord(steamid64);
 
                 if (row == null) {
-                    xml.center("No records found for SteamID64: ") {
-                        a(href: "http://steamcommunity.com/profiles/" + steamid64, steamid64)
-                    }
+                    xml.center("No records found for SteamID64: " + steamid64)
                 } else {
                     def steamIdInfo= reader.getSteamIDInfo(steamid64)
 

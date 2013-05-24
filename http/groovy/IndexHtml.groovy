@@ -36,9 +36,9 @@ public class IndexHtml extends WebPageBase {
             def divName= chartTypes[navItem] == null ? "${navItem}_div" : navItem
             queries.table= navItem
             if (htmlDiv.contains(navItem)) {
-                stndChartsParams << [dataHtml.generatePage(reader, queries), null, divName, null]
+                stndChartsParams << [dataHtml.generatePage(), null, divName, null]
             } else {
-                stndChartsParams << [dataJson.generatePage(reader, queries), navItem, divName, chartTypes[navItem]]
+                stndChartsParams << [dataJson.generatePage(), navItem, divName, chartTypes[navItem]]
             }
         }
         builder.script(type: 'text/javascript') {
@@ -83,7 +83,7 @@ public class IndexHtml extends WebPageBase {
         function open(map) {
             \$( "#dialog" ).dialog( "option", "title", map );
             \$( "#dialog" ).dialog( "open" );
-            var data= \$.ajax({url: "data.json?table=leveldata&name=" + map, dataType:"json", async: false}).responseText;
+            var data= \$.ajax({url: "data.json?table=leveldata&level=" + map, dataType:"json", async: false}).responseText;
             drawChart(data, 'Difficulties', 'dialog', 'Table');
         }
             ${WebCommon.filterChartJs}
@@ -115,7 +115,6 @@ $chartCalls
 
                     result["avg-wave"]= String.format("%.2f", result.waveaccum / (row.wins + row.losses))
                     result["formatted-time"]= Time.secToStr(row.time)
-                    result.remove("id")
                     result.remove("waveaccum")
                     'entry'(result)
                 }
@@ -135,19 +134,15 @@ $chartCalls
                     }
                     
                     result["formatted-time"]= Time.secToStr(result.time)
-                    result.remove("id")
                     'entry'(result) {
-                        reader.getLevelData(result.name).each {difficulty ->
+                        reader.getLevelData(result.level).each {difficulty ->
                             accum.keySet().each {key ->
                                 accum[key]+= row[key]
                             }
 
                             difficulty["avg-wave"]= String.format("%.2f", difficulty.waveaccum / (row.wins + row.losses))
                             difficulty["formatted-time"]= Time.secToStr(row.time)
-                            difficulty.remove("id")
                             difficulty.remove("waveaccum")
-                            difficulty.remove("difficulty_id")
-                            difficulty.remove("level_id")
                             builder.'difficulty'(difficulty)
                         }
                     }
@@ -163,7 +158,6 @@ $chartCalls
                         if (category == "perks" || attr.stat.toLowerCase().contains("time")) {
                             attr["formatted"]= Time.secToStr(attr["value"])
                         }
-                        attr.remove("record_id")
                         attr.remove("category")
                         'entry'(attr)
                     }

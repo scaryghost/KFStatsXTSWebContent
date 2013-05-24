@@ -12,10 +12,10 @@ import groovy.json.JsonBuilder
  * Generates the json data for the page data.json
  * @author etsai
  */
-public class DataJson implements Resource {
+public class DataJson extends Resource {
     private static def colStyle= "text-align:center"
     
-    public String generatePage(DataReader reader, Map<String, String> queries) {
+    public String generatePage() {
         def columns
         def data= []
         def builder= new JsonBuilder()
@@ -29,7 +29,7 @@ public class DataJson implements Resource {
                     [label: it[0], type: it[1]]
                 }
                 reader.getDifficulties().each {row ->
-                    data << [c: [[v: row.name, f:"<a href='wavedata.html?name=${row.name}&length=${row.length}'>${row.name}</a>"], 
+                    data << [c: [[v: row.difficulty, f:"<a href='wavedata.html?difficulty=${row.difficulty}&length=${row.length}'>${row.difficulty}</a>"], 
                         [v: row.length, p:[style: colStyle]],
                         [v: row.wins, p:[style: colStyle]],
                         [v: row.losses, p:[style: colStyle]],
@@ -54,7 +54,7 @@ public class DataJson implements Resource {
                     [label: it[0], type: it[1]]
                 }
                 reader.getLevels().each {row ->
-                    data << [c: [[v: row.name, f:"<a href='javascript:open(\"${row.name}\")'>${row.name}</a>"], 
+                    data << [c: [[v: row.level, f:"<a href='javascript:open(\"${row.level}\")'>${row.level}</a>"], 
                         [v: row.wins, p:[style: colStyle]],
                         [v: row.losses, p:[style: colStyle]],
                         [v: row.time, f: Time.secToStr(row.time), p:[style: colStyle]],
@@ -74,9 +74,9 @@ public class DataJson implements Resource {
                 columns= [["Difficulty", "string"], ["Length", "string"], ["Wins", "number"], ["Losses", "number"], ["Avg Wave", "number"], ["Time", "number"]].collect {
                     [label: it[0], type: it[1]]
                 }
-                reader.getLevelData(queryValues[Queries.name]).each {row ->
+                reader.getLevelData(queryValues[Queries.level]).each {row ->
                     def avgWave= row.waveaccum / (row.wins + row.losses)
-                    data << [c: [[v: row.name, f:"<a href='wavedata.html?name=${row.name}&length=${row.length}&level=${queryValues[Queries.name]}' style='color:#0073BF'>${row.name}</a>"], 
+                    data << [c: [[v: row.difficulty, f:"<a href='wavedata.html?difficulty=${row.difficulty}&length=${row.length}&level=${queryValues[Queries.level]}' style='color:#0073BF'>${row.difficulty}</a>"], 
                             [v:row.length], [v: row.wins], [v: row.losses], [v:avgWave, f: String.format("%.2f",avgWave)], 
                             [v:row.time, f: Time.secToStr(row.time)]
                     ]]
@@ -97,8 +97,8 @@ public class DataJson implements Resource {
                 columns= [["Name", "string"], ["Wins", "number"], ["Losses", "number"], ["Time", "number"]].collect {
                     [label: it[0], type: it[1]]
                 }
-                reader.getDifficultyData(queryValues[Queries.name], queryValues[Queries.length]).each {row ->
-                    data << [c: [[v: row.name], 
+                reader.getDifficultyData(queryValues[Queries.difficulty], queryValues[Queries.length]).each {row ->
+                    data << [c: [[v: row.level], 
                         [v: row.wins, p:[style: colStyle]],
                         [v: row.losses, p:[style: colStyle]],
                         [v: row.time, f: Time.secToStr(row.time), p:[style: colStyle]],
@@ -143,8 +143,8 @@ public class DataJson implements Resource {
                 break
             case "wave":
                 def waveSplit= [:], statKeys= new TreeSet()
-                def waveData= queryValues[Queries.level] == null ? reader.getWaveData(queryValues[Queries.name], queryValues[Queries.length], queryValues[Queries.group]) : 
-                        reader.getWaveData(queryValues[Queries.level], queryValues[Queries.name], queryValues[Queries.length], queryValues[Queries.group])
+                def waveData= queryValues[Queries.level] == null ? reader.getWaveData(queryValues[Queries.difficulty], queryValues[Queries.length], queryValues[Queries.group]) : 
+                        reader.getWaveData(queryValues[Queries.level], queryValues[Queries.difficulty], queryValues[Queries.length], queryValues[Queries.group])
 
                 waveData.each {row ->
                     statKeys << row.stat

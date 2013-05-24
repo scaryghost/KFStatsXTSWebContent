@@ -2,7 +2,7 @@ import com.github.etsai.kfsxtrackingserver.DataReader
 import com.github.etsai.kfsxtrackingserver.web.Resource
 import groovy.xml.MarkupBuilder
 
-public abstract class WebPageBase implements Resource {
+public abstract class WebPageBase extends Resource {
     public static def defaultJs= """
         //Div scrolling js taken from http://gazpo.com/2012/03/horizontal-content-scroll/
         function goto(id){   
@@ -19,7 +19,7 @@ public abstract class WebPageBase implements Resource {
         }
     """
 
-    protected def htmlDiv, navigation, categoryMthd, dataHtml, dataJson, queries, reader
+    protected def htmlDiv, navigation, categoryMthd, dataHtml, dataJson
     protected def stylesheets= ['http/css/kfstatsxHtml.css']
     protected def jsFiles= ['//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js',
             'https://www.google.com/jsapi?autoload={"modules":[{"name":"visualization","version":"1","packages":["controls"]}]}']
@@ -39,11 +39,19 @@ public abstract class WebPageBase implements Resource {
     protected abstract void fillVisualizationJS(def builder)
     protected abstract void fillContentBoxes(def builder)
 
-    public String generatePage(DataReader reader, Map<String, String> queries) {
+    public void setDataReader(DataReader reader) {
+        super.setDataReader(reader);
+        dataHtml.setDataReader(reader);
+        dataJson.setDataReader(reader);
+    }
+    public void setQueries(Map<String, String> queries) {
+        super.setQueries(queries);
+        dataHtml.setQueries(queries);
+        dataJson.setQueries(queries);
+    }
+    public String generatePage() {
         def writer= new StringWriter()
         def htmlBuilder= new MarkupBuilder(writer)
-        this.queries= queries
-        this.reader= reader
 
         if (queries.xml != null) {
             toXml(htmlBuilder)

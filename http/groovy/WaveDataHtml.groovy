@@ -19,7 +19,7 @@ public class WaveDataHtml extends WebPageBase {
                     option(value: "#summary_div", selected: "selected", 'Summary')
                 }
                 navigation.each {item ->
-                    option(value: "#${item}_dashboard_div", item)
+                    option(value: "#${item}_dashboard_div", item.capitalize())
                 }
             }
         }
@@ -29,11 +29,11 @@ public class WaveDataHtml extends WebPageBase {
         queries.table= "wave"
         navigation.each {item ->
             queries.group= item
-            parameters << [dataJson.generatePage(reader, queries), item]
+            parameters << [dataJson.generatePage(), item]
         }
         if (queries.level == null) {
             queries.table= "difficultydata"
-            parameters << [dataJson.generatePage(reader, queries), 'Summary', 'summary_div']
+            parameters << [dataJson.generatePage(), 'Summary', 'summary_div']
         }
         builder.script(type: 'text/javascript') {
             mkp.yieldUnescaped(dashboardVisualization(parameters))
@@ -151,10 +151,7 @@ public class WaveDataHtml extends WebPageBase {
             builder.'wave-data'(attrs) {
                 if (queries.level == null) {
                     'stats'(category: 'summary') {
-                        reader.getDifficultyData(queries.name, queries.length).each {row ->
-                            row.remove('difficulty_id')
-                            row.remove('level_id')
-
+                        reader.getDifficultyData(queries.difficulty, queries.length).each {row ->
                             row["formatted-time"]= Time.secToStr(row.time)
                             'entry'(row)
                         }
@@ -163,8 +160,8 @@ public class WaveDataHtml extends WebPageBase {
                 reader.getWaveDataCategories().each {category ->
                     builder.'stats'(category: category) {
                         def waves= [:]
-                        def rows= queries.level == null ? reader.getWaveData(queries.name, queries.length, category) : 
-                            reader.getWaveData(queries.level, queries.name, queries.length, category)
+                        def rows= queries.level == null ? reader.getWaveData(queries.difficulty, queries.length, category) : 
+                            reader.getWaveData(queries.level, queries.difficulty, queries.length, category)
                         rows.each {row ->
                             if (waves[row.wave] == null) {
                                 waves[row.wave]= []
