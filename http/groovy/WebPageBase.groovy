@@ -34,7 +34,7 @@ public abstract class WebPageBase extends Resource {
     public String getPageTitle() {
         return "KFStatsX"
     }
-    protected abstract String toXml(def builder)
+    protected abstract void buildXml(def builder)
     protected abstract void fillHeader(def builder)
     protected abstract void fillVisualizationJS(def builder)
     protected abstract void fillContentBoxes(def builder)
@@ -54,7 +54,7 @@ public abstract class WebPageBase extends Resource {
         def htmlBuilder= new MarkupBuilder(writer)
 
         if (queries.xml != null) {
-            toXml(htmlBuilder)
+            buildXml(htmlBuilder)
             return writer
         }
         if (categoryMthd != null) {

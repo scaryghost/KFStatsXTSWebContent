@@ -18,7 +18,7 @@ public class ProfileHtml extends IndexHtml {
         return "${super.getPageTitle()} - $name"
     }
 
-    protected String toXml(def builder) {
+    protected void buildXml(def builder) {
         def steamid64= queries.steamid64
         def profileAttr= reader.getRecord(steamid64)
         
@@ -26,8 +26,18 @@ public class ProfileHtml extends IndexHtml {
             if (profileAttr == null) {
                 'error'("No stats available for steamdID64: ${steamid64}")
             } else {
+                profileAttr.remove('steamid64')
                 profileAttr.putAll(reader.getSteamIDInfo(steamid64))
-                'profile'(profileAttr) {
+                'profile'(steamid64: steamid64) {
+                    'stats'(category: 'profile') {
+                        profileAttr.each {
+                            def attr= [stat: it.getKey(), value: it.getValue()]
+                            if (attr.stat.toLowerCase().contains("time")) {
+                                attr["formatted"]= Time.secToStr(attr.value)
+                            }
+                            'entry'(attr)
+                        }
+                    }
                     reader.getAggregateCategories().each {category ->
                         'stats'(category: category) {
                             reader.getAggregateData(category, steamid64).each {row ->

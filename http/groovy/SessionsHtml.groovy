@@ -17,17 +17,18 @@ public class SessionsHtml extends PagedTable {
         builder.h3("Match History")
     }
 
-    protected String toXml(def builder) {
+    protected void buildXml(def builder) {
         def queryValues= Queries.parseQuery(queries)
-        def attrs= [category: "sessions", steamid64: queries.steamid64]
 
         builder.kfstatsx() {
-            'stats'(attrs) {
-                WebCommon.partialQuery(reader, queryValues, false).each {row ->
-                    row.remove("record_id")
-                    row.remove("level_id")
-                    row.remove("difficulty_id")
-                    'entry'(row)
+            'profile'(steamid64: queries.steamid64) {
+                'stats'(category: "sessions") {
+                    WebCommon.partialQuery(reader, queryValues, false).each {row ->
+                        row.remove("record_id")
+                        row.remove("level_id")
+                        row.remove("difficulty_id")
+                        'entry'(row)
+                    }
                 }
             }
         }

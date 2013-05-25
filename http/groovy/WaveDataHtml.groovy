@@ -144,7 +144,7 @@ public class WaveDataHtml extends WebPageBase {
         return "${WebCommon.chartJs}\n$dasboardJs$chartCalls        }\n    "
     }
 
-    protected String toXml(def builder) {
+    protected void buildXml(def builder) {
         builder.kfstatsx() {
             def attrs= queries.clone()
             attrs.remove('xml')
