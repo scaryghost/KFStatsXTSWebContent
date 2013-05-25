@@ -73,11 +73,11 @@ public class DataHtml extends Resource {
                                 }
                                 tr() {
                                     td("Finales Played")
-                                    td(row.finale_played)
+                                    td(row.finales_played)
                                 }
                                 tr() {
                                     td("Finales Survived")
-                                    td(row.finale_survived)
+                                    td(row.finales_survived)
                                 }
                                 tr() {
                                     td("Time Connected")
