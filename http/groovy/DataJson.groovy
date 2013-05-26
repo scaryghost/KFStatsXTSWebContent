@@ -114,21 +114,23 @@ public class DataJson extends Resource {
                 ]]
                 break
             case "records":
-                columns= [["Name", "string"], ["Wins", "number"], ["Losses", "number"], ["Disconnects", "number"]].collect {
-                    [label: it[0], type: it[1]]
+                columns= [["name", "Name", "string"], ["wins", "Wins", "number"], ["losses", "Losses", "number"], ["disconnects", "Disconnects", "number"], 
+                ["time_connected", "Time Connected", "numner"]].collect {
+                    [id: it[0], label: it[1], type: it[2]]
                 }
 
                 WebCommon.partialQuery(reader, queryValues, true).each {row -> 
                     data << [c: [[v: row.name, f: "<a href=profile.html?steamid64=${row.steamid64}>${row.name}</a>"], 
                         [v: row.wins, p:[style: colStyle]],
                         [v: row.losses, p:[style: colStyle]],
-                        [v: row.disconnects, p:[style: colStyle]]]]
+                        [v: row.disconnects, p:[style: colStyle]],
+                        [v: row.time_connected, f: Time.secToStr(row.time_connected), p:[style: colStyle]]]]
                 }
                 break
             case "sessions":
                 columns= [["Level", "string"], ["Difficulty", "string"], ["Length", "string"],
                         ["Result", "string"], ["Wave", "number"], ["Duration", "number"], ["Timestamp", "string"]].collect {
-                    [label: it[0], type: it[1]]
+                    [id: it[0], label: it[0], type: it[1]]
                 }
                 WebCommon.partialQuery(reader, queryValues, false).each {row ->
                     data << [c: [[v: row.level], 

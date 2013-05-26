@@ -90,7 +90,7 @@ public abstract class PagedTable extends WebPageBase {
                 });
                 google.visualization.events.addListener(chart.getChart(), 'sort', function(properties) {
                     order= properties["ascending"] ? "asc" : "desc";
-                    group= data.getColumnLabel(properties["column"]);
+                    group= data.getColumnId(properties["column"]);
                     data= buildDataTable();
                     chart.setOption('sortColumn', properties["column"]);
                     chart.setOption('sortAscending', properties["ascending"]);
