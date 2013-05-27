@@ -4,11 +4,7 @@
     <page name="data.json" script="DataJson.groovy" />
     <page name="wavedata.html" script="WaveDataHtml.groovy" />
     <page name="index.html" script="IndexHtml.groovy" />
-    <page name="index.xml" script="IndexXml.groovy" />
     <page name="records.html" script="RecordsHtml.groovy" />
-    <page name="records.xml" script="RecordsXml.groovy" />
     <page name="profile.html" script="ProfileHtml.groovy" />
-    <page name="profile.xml" script="ProfileXml.groovy" />
-    <page name="sessions.html" script="SessionsHtml.groovy" />
-    <page name="sessions.xml" script="SessionsXml.groovy" />
+    <page name="matchhistory.html" script="MatchHistoryHtml.groovy" />
 </webpages>

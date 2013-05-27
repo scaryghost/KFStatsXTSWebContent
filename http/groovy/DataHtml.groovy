@@ -90,7 +90,7 @@ public class DataHtml extends Resource {
                                 }
                                 tr() {
                                     td(colspan:"3") {
-                                        a(target: "_blank", href: "sessions.html?steamid64=" + steamid64, "Match History")
+                                        a(target: "_blank", href: "matchhistory.html?steamid64=" + steamid64, "Match History")
                                     }
                                 }
                             }

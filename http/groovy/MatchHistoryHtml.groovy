@@ -1,6 +1,6 @@
-public class SessionsHtml extends PagedTable {
-    public SessionsHtml() {
-        super("sessions", "sessions.html")
+public class MatchHistoryHtml extends PagedTable {
+    public MatchHistoryHtml() {
+        super("matchhistory", "matchhistory.html")
     }
 
     public String getPageTitle() {

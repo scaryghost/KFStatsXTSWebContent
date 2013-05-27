@@ -16,7 +16,7 @@ public class WebCommon {
         if (records) {
             return reader.getRecords(group, order, start, end)
         }
-        return reader.getSessions(queryValues[Queries.steamid64], group, order, start, end)
+        return reader.getMatchHistory(queryValues[Queries.steamid64], group, order, start, end)
     }
 
     public static def generateSummary(reader) {

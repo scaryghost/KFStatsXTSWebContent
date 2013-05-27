@@ -127,7 +127,7 @@ public class DataJson extends Resource {
                         [v: row.time_connected, f: Time.secToStr(row.time_connected), p:[style: colStyle]]]]
                 }
                 break
-            case "sessions":
+            case "matchhistory":
                 columns= [["Level", "string"], ["Difficulty", "string"], ["Length", "string"],
                         ["Result", "string"], ["Wave", "number"], ["Duration", "number"], ["Timestamp", "string"]].collect {
                     [id: it[0], label: it[0], type: it[1]]
