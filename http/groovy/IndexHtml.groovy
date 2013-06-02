@@ -84,9 +84,13 @@ public class IndexHtml extends WebPageBase {
             \$( "#dialog" ).dialog( "option", "title", opts["map"] );
             \$( "#dialog" ).dialog( "open" );
             
-            var query= "table=leveldata&level=" + opts["map"];
-            if ("steamid64" in opts) {
-                query+= "&steamid64=" + opts["steamid64"];
+            var query= ""; 
+            var keys= Object.keys(opts);
+            for(var index in keys) {
+                if (query.length != 0) {
+                    query+= "&";
+                }
+                query+= keys[index] + "=" + opts[keys[index]];
             }
             var data= \$.ajax({url: "data.json?" + query, dataType:"json", async: false}).responseText;
             drawChart(data, 'Difficulties', 'dialog', 'Table');

@@ -75,7 +75,7 @@ public class DataJson extends Resource {
                     }
                     def totals= [win: 0, loss: 0, disconnect:0, duration:0]
                     difficulties.each {setting, stats ->
-                        data << [c: [[v: setting[0]], [v: setting[1]]].plus(matchHistoryResults(stats))]
+                        data << [c: [[v: setting[0], f:"<a href='javascript:open({\"table\":\"difficultydata\",\"difficulty\":\"${setting[0]}\",\"length\":\"${setting[1]}\",\"steamid64\":\"${queryValues[Queries.steamid64]}\"})'>${setting[0]}</a>"], [v: setting[1]]].plus(matchHistoryResults(stats))]
                         stats.each {stat, value ->
                             totals[stat]+= value
                         }
@@ -90,7 +90,7 @@ public class DataJson extends Resource {
                         [label: it[0], type: it[1]]
                     }
                     reader.getLevels().each {row ->
-                        data << [c: [[v: row.level, f:"<a href='javascript:open({\"map\":\"${row.level}\"})'>${row.level}</a>"], 
+                        data << [c: [[v: row.level, f:"<a href='javascript:open({\"table\":\"leveldata\",\"level\":\"${row.level}\"})'>${row.level}</a>"], 
                             [v: row.wins, p:[style: colStyle]],
                             [v: row.losses, p:[style: colStyle]],
                             [v: row.time, f: Time.secToStr(row.time), p:[style: colStyle]],
@@ -123,7 +123,7 @@ public class DataJson extends Resource {
                     }
                     def totals= [win: 0, loss: 0, disconnect:0, duration:0]
                     levels.each {level, stats ->
-                        data << [c: [[v: level, f:"<a href='javascript:open({\"map\":\"${level}\", \"steamid64\":\"${queryValues[Queries.steamid64]}\"})'>${level}</a>"]].plus(matchHistoryResults(stats))]
+                        data << [c: [[v: level, f:"<a href='javascript:open({\"table\":\"leveldata\",\"level\":\"${level}\",\"steamid64\":\"${queryValues[Queries.steamid64]}\"})'>${level}</a>"]].plus(matchHistoryResults(stats))]
                         stats.each {stat, value ->
                             totals[stat]+= value
                         }
@@ -186,25 +186,54 @@ public class DataJson extends Resource {
                 }
                 break
             case "difficultydata":
-                def totals= [wins: 0, losses: 0, time: 0]
-                columns= [["Name", "string"], ["Wins", "number"], ["Losses", "number"], ["Time", "number"]].collect {
-                    [label: it[0], type: it[1]]
-                }
-                reader.getDifficultyData(queryValues[Queries.difficulty], queryValues[Queries.length]).each {row ->
-                    data << [c: [[v: row.level], 
-                        [v: row.wins, p:[style: colStyle]],
-                        [v: row.losses, p:[style: colStyle]],
-                        [v: row.time, f: Time.secToStr(row.time), p:[style: colStyle]],
+                if (queryValues[Queries.steamid64] == null) {
+                    def totals= [wins: 0, losses: 0, time: 0]
+                    columns= [["Name", "string"], ["Wins", "number"], ["Losses", "number"], ["Time", "number"]].collect {
+                        [label: it[0], type: it[1]]
+                    }
+                    reader.getDifficultyData(queryValues[Queries.difficulty], queryValues[Queries.length]).each {row ->
+                        data << [c: [[v: row.level], 
+                            [v: row.wins, p:[style: colStyle]],
+                            [v: row.losses, p:[style: colStyle]],
+                            [v: row.time, f: Time.secToStr(row.time), p:[style: colStyle]],
+                        ]]
+                        totals["wins"]+= row.wins
+                        totals["losses"]+= row.losses
+                        totals["time"]+= row.time.toInteger()
+                    }
+                    data << [c: [[v: "Totals"], 
+                        [v: totals["wins"], p:[style: colStyle]],
+                        [v: totals["losses"], p:[style: colStyle]],
+                        [v: totals["time"], f: Time.secToStr(totals["time"]), p:[style: colStyle]],
                     ]]
-                    totals["wins"]+= row.wins
-                    totals["losses"]+= row.losses
-                    totals["time"]+= row.time.toInteger()
+                } else {
+                    def difficultydata= [:]
+                    reader.getMatchHistory(queryValues[Queries.steamid64]).each {row ->
+                        if (row.difficulty == queryValues[Queries.difficulty] && row.length == queryValues[Queries.length]) {
+                            if (difficultydata[row.level] == null) {
+                                difficultydata[row.level]= [:]
+                                difficultydata[row.level]["duration"]= 0
+                            }
+                            if (difficultydata[row.level][row.result] == null) {
+                                difficultydata[row.level][row.result]= 0
+                            }
+                            difficultydata[row.level][row.result]++
+                            difficultydata[row.level]["duration"]+= row.duration
+                        }
+                    }
+
+                    columns= [["Name", "string"], ["Wins", "number"], ["Losses", "number"], ["Disconnects", "number"], ["Time", "number"]].collect {
+                        [label: it[0], type: it[1]]
+                    }
+                    def totals= [win: 0, loss: 0, disconnect:0, duration:0]
+                    difficultydata.each {level, stats ->
+                        data << [c: [[v: level]].plus(matchHistoryResults(stats))]
+                        stats.each {stat, value ->
+                            totals[stat]+= value
+                        }
+                    }
+                    data << [c: [[v: "Totals"], [v: totals.win], [v: totals.loss], [v: totals.disconnect], [v: Time.secToStr(totals.duration)]]]
                 }
-                data << [c: [[v: "Totals"], 
-                    [v: totals["wins"], p:[style: colStyle]],
-                    [v: totals["losses"], p:[style: colStyle]],
-                    [v: totals["time"], f: Time.secToStr(totals["time"]), p:[style: colStyle]],
-                ]]
                 break
             case "records":
                 columns= [["name", "Name", "string"], ["wins", "Wins", "number"], ["losses", "Losses", "number"], ["disconnects", "Disconnects", "number"], 
