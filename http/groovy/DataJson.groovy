@@ -21,76 +21,169 @@ public class DataJson extends Resource {
         def builder= new JsonBuilder()
         def queryValues= Queries.parseQuery(queries)
 
+        def matchHistoryResults= {stats ->
+            ["win", "loss", "disconnect", "duration"].collect {
+                [v: stats[it] == null ? 0 : stats[it]]
+            }
+        }
+
         switch(queryValues[Queries.table]) {
             case "difficulties":
-                def totals= [wins: 0, losses: 0, time: 0]
-                columns= [["Name", "string"], ["Length", "string"], ["Wins", "number"],
-                    ["Losses", "number"], ["Avg Wave", "number"], ["Time", "number"]].collect {
-                    [label: it[0], type: it[1]]
-                }
-                reader.getDifficulties().each {row ->
-                    data << [c: [[v: row.difficulty, f:"<a href='wavedata.html?difficulty=${row.difficulty}&length=${row.length}'>${row.difficulty}</a>"], 
-                        [v: row.length, p:[style: colStyle]],
-                        [v: row.wins, p:[style: colStyle]],
-                        [v: row.losses, p:[style: colStyle]],
-                        [v: String.format("%.2f",row.waveaccum / (row.wins + row.losses)), p:[style: colStyle]],
-                        [v: row.time, f: Time.secToStr(row.time), p:[style: colStyle]]
+                if (queryValues[Queries.steamid64] == null) {
+                    def totals= [wins: 0, losses: 0, time: 0]
+                    columns= [["Name", "string"], ["Length", "string"], ["Wins", "number"],
+                        ["Losses", "number"], ["Avg Wave", "number"], ["Time", "number"]].collect {
+                        [label: it[0], type: it[1]]
+                    }
+                    reader.getDifficulties().each {row ->
+                        data << [c: [[v: row.difficulty, f:"<a href='wavedata.html?difficulty=${row.difficulty}&length=${row.length}'>${row.difficulty}</a>"], 
+                            [v: row.length, p:[style: colStyle]],
+                            [v: row.wins, p:[style: colStyle]],
+                            [v: row.losses, p:[style: colStyle]],
+                            [v: String.format("%.2f",row.waveaccum / (row.wins + row.losses)), p:[style: colStyle]],
+                            [v: row.time, f: Time.secToStr(row.time), p:[style: colStyle]]
+                        ]]
+                        totals["wins"]+= row.wins
+                        totals["losses"]+= row.losses
+                        totals["time"]+= row.time
+                    }
+                    data << [c: [[v: "Totals"], 
+                        [v: "", f: "---", p:[style: colStyle]],
+                        [v: totals["wins"], p:[style: colStyle]],
+                        [v: totals["losses"], p:[style: colStyle]],
+                        [v: 0, f: "---", p:[style: colStyle]],
+                        [v: totals["time"], f: Time.secToStr(totals["time"]), p:[style: colStyle]],
                     ]]
-                    totals["wins"]+= row.wins
-                    totals["losses"]+= row.losses
-                    totals["time"]+= row.time
+                } else {
+                    def difficulties= [:]
+                    reader.getMatchHistory(queryValues[Queries.steamid64]).each {row ->
+                        def difficulty= [row.difficulty, row.length]
+                        if (difficulties[difficulty] == null) {
+                            difficulties[difficulty]= [:]
+                            difficulties[difficulty]["duration"]= 0
+                        }
+                        if (difficulties[difficulty][row.result] == null) {
+                            difficulties[difficulty][row.result]= 0
+                        }
+                        difficulties[difficulty][row.result]++
+                        difficulties[difficulty]["duration"]+= row.duration
+                    }
+
+                    columns= [["Name", "string"], ["Length", "string"], ["Wins", "number"],
+                        ["Losses", "number"], ["Disconnects", "number"], ["Time", "number"]].collect {
+                        [label: it[0], type: it[1]]
+                    }
+                    def totals= [win: 0, loss: 0, disconnect:0, duration:0]
+                    difficulties.each {setting, stats ->
+                        data << [c: [[v: setting[0]], [v: setting[1]]].plus(matchHistoryResults(stats))]
+                        stats.each {stat, value ->
+                            totals[stat]+= value
+                        }
+                    }
+                    data << [c: [[v: "Totals"], [v: "------"], [v: totals.win], [v: totals.loss], [v: totals.disconnect], [v: Time.secToStr(totals.duration)]]]
                 }
-                data << [c: [[v: "Totals"], 
-                    [v: "", f: "---", p:[style: colStyle]],
-                    [v: totals["wins"], p:[style: colStyle]],
-                    [v: totals["losses"], p:[style: colStyle]],
-                    [v: 0, f: "---", p:[style: colStyle]],
-                    [v: totals["time"], f: Time.secToStr(totals["time"]), p:[style: colStyle]],
-                ]]
                break
             case "levels":
-                def totals= [wins: 0, losses: 0, time: 0]
-                columns= [["Name", "string"], ["Wins", "number"], ["Losses", "number"], ["Time", "number"]].collect {
-                    [label: it[0], type: it[1]]
-                }
-                reader.getLevels().each {row ->
-                    data << [c: [[v: row.level, f:"<a href='javascript:open(\"${row.level}\")'>${row.level}</a>"], 
-                        [v: row.wins, p:[style: colStyle]],
-                        [v: row.losses, p:[style: colStyle]],
-                        [v: row.time, f: Time.secToStr(row.time), p:[style: colStyle]],
+                if (queryValues[Queries.steamid64] == null) {
+                    def totals= [wins: 0, losses: 0, time: 0]
+                    columns= [["Name", "string"], ["Wins", "number"], ["Losses", "number"], ["Time", "number"]].collect {
+                        [label: it[0], type: it[1]]
+                    }
+                    reader.getLevels().each {row ->
+                        data << [c: [[v: row.level, f:"<a href='javascript:open({\"map\":\"${row.level}\"})'>${row.level}</a>"], 
+                            [v: row.wins, p:[style: colStyle]],
+                            [v: row.losses, p:[style: colStyle]],
+                            [v: row.time, f: Time.secToStr(row.time), p:[style: colStyle]],
+                        ]]
+                        totals["wins"]+= row.wins
+                        totals["losses"]+= row.losses
+                        totals["time"]+= row.time.toInteger()
+                    }
+                    data << [c: [[v: "Totals"], 
+                        [v: totals["wins"], p:[style: colStyle]],
+                        [v: totals["losses"], p:[style: colStyle]],
+                        [v: totals["time"], f: Time.secToStr(totals["time"]), p:[style: colStyle]],
                     ]]
-                    totals["wins"]+= row.wins
-                    totals["losses"]+= row.losses
-                    totals["time"]+= row.time.toInteger()
+                } else {
+                    def levels= [:]
+                    reader.getMatchHistory(queryValues[Queries.steamid64]).each {row ->
+                        if (levels[row.level] == null) {
+                            levels[row.level]= [:]
+                            levels[row.level]["duration"]= 0
+                        }
+                        if (levels[row.level][row.result] == null) {
+                            levels[row.level][row.result]= 0
+                        }
+                        levels[row.level][row.result]++
+                        levels[row.level]["duration"]+= row.duration
+                    }
+
+                    columns= [["Name", "string"], ["Wins", "number"], ["Losses", "number"], ["Disconnects", "number"], ["Time", "number"]].collect {
+                        [label: it[0], type: it[1]]
+                    }
+                    def totals= [win: 0, loss: 0, disconnect:0, duration:0]
+                    levels.each {level, stats ->
+                        data << [c: [[v: level, f:"<a href='javascript:open({\"map\":\"${level}\", \"steamid64\":\"${queryValues[Queries.steamid64]}\"})'>${level}</a>"]].plus(matchHistoryResults(stats))]
+                        stats.each {stat, value ->
+                            totals[stat]+= value
+                        }
+                    }
+                    data << [c: [[v: "Totals"], [v: totals.win], [v: totals.loss], [v: totals.disconnect], [v: Time.secToStr(totals.duration)]]]
                 }
-                data << [c: [[v: "Totals"], 
-                    [v: totals["wins"], p:[style: colStyle]],
-                    [v: totals["losses"], p:[style: colStyle]],
-                    [v: totals["time"], f: Time.secToStr(totals["time"]), p:[style: colStyle]],
-                ]]
                 break
             case "leveldata":
-                def totals= [wins: 0, losses: 0, time: 0]
-                columns= [["Difficulty", "string"], ["Length", "string"], ["Wins", "number"], ["Losses", "number"], ["Avg Wave", "number"], ["Time", "number"]].collect {
-                    [label: it[0], type: it[1]]
-                }
-                reader.getLevelData(queryValues[Queries.level]).each {row ->
-                    def avgWave= row.waveaccum / (row.wins + row.losses)
-                    data << [c: [[v: row.difficulty, f:"<a href='wavedata.html?difficulty=${row.difficulty}&length=${row.length}&level=${queryValues[Queries.level]}' style='color:#0073BF'>${row.difficulty}</a>"], 
-                            [v:row.length], [v: row.wins], [v: row.losses], [v:avgWave, f: String.format("%.2f",avgWave)], 
-                            [v:row.time, f: Time.secToStr(row.time)]
+                if (queryValues[Queries.steamid64] == null) {
+                    def totals= [wins: 0, losses: 0, time: 0]
+                    columns= [["Difficulty", "string"], ["Length", "string"], ["Wins", "number"], ["Losses", "number"], ["Avg Wave", "number"], ["Time", "number"]].collect {
+                        [label: it[0], type: it[1]]
+                    }
+                    reader.getLevelData(queryValues[Queries.level]).each {row ->
+                        def avgWave= row.waveaccum / (row.wins + row.losses)
+                        data << [c: [[v: row.difficulty, f:"<a href='wavedata.html?difficulty=${row.difficulty}&length=${row.length}&level=${queryValues[Queries.level]}' style='color:#0073BF'>${row.difficulty}</a>"], 
+                                [v:row.length], [v: row.wins], [v: row.losses], [v:avgWave, f: String.format("%.2f",avgWave)], 
+                                [v:row.time, f: Time.secToStr(row.time)]
+                        ]]
+                        totals.wins+= row.wins
+                        totals.losses+= row.losses
+                        totals.time+= row.time
+                    }
+                    data << [c: [[v: "Totals"], 
+                        [v: "", f: "---"],
+                        [v: totals["wins"]],
+                        [v: totals["losses"]],
+                        [v: 0, f: "---"],
+                        [v: totals["time"], f: Time.secToStr(totals["time"])],
                     ]]
-                    totals.wins+= row.wins
-                    totals.losses+= row.losses
-                    totals.time+= row.time
+                } else {
+                    def leveldata= [:]
+                    reader.getMatchHistory(queryValues[Queries.steamid64]).each {row ->
+                        if (row.level == queryValues[Queries.level]) {
+                            def difficulty= [row.difficulty, row.length]
+                            if (leveldata[difficulty] == null) {
+                                leveldata[difficulty]= [:]
+                                leveldata[difficulty]["duration"]= 0
+                            }
+                            if (leveldata[difficulty][row.result] == null) {
+                                leveldata[difficulty][row.result]= 0
+                            }
+                            leveldata[difficulty][row.result]++
+                            leveldata[difficulty]["duration"]+= row.duration
+                        }
+                    }
+
+                    columns= [["Name", "string"], ["Length", "string"], ["Wins", "number"],
+                        ["Losses", "number"], ["Disconnects", "number"], ["Time", "number"]].collect {
+                        [label: it[0], type: it[1]]
+                    }
+                    def totals= [win: 0, loss: 0, disconnect:0, duration:0]
+                    leveldata.each {setting, stats ->
+                        data << [c: [[v: setting[0]], [v: setting[1]]].plus(matchHistoryResults(stats))]
+                        stats.each {stat, value ->
+                            totals[stat]+= value
+                        }
+                    }
+                    data << [c: [[v: "Totals"], [v: "------"], [v: totals.win], [v: totals.loss], [v: totals.disconnect], [v: Time.secToStr(totals.duration)]]]
                 }
-                data << [c: [[v: "Totals"], 
-                    [v: "", f: "---"],
-                    [v: totals["wins"]],
-                    [v: totals["losses"]],
-                    [v: 0, f: "---"],
-                    [v: totals["time"], f: Time.secToStr(totals["time"])],
-                ]]
                 break
             case "difficultydata":
                 def totals= [wins: 0, losses: 0, time: 0]

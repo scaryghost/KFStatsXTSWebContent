@@ -80,10 +80,15 @@ public class IndexHtml extends WebPageBase {
                 width: document.getElementById('levels_div').offsetWidth * 0.985
             });
         });
-        function open(map) {
-            \$( "#dialog" ).dialog( "option", "title", map );
+        function open(opts) {
+            \$( "#dialog" ).dialog( "option", "title", opts["map"] );
             \$( "#dialog" ).dialog( "open" );
-            var data= \$.ajax({url: "data.json?table=leveldata&level=" + map, dataType:"json", async: false}).responseText;
+            
+            var query= "table=leveldata&level=" + opts["map"];
+            if ("steamid64" in opts) {
+                query+= "&steamid64=" + opts["steamid64"];
+            }
+            var data= \$.ajax({url: "data.json?" + query, dataType:"json", async: false}).responseText;
             drawChart(data, 'Difficulties', 'dialog', 'Table');
         }
             ${WebCommon.filterChartJs}

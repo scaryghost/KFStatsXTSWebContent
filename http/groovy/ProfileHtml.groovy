@@ -4,17 +4,12 @@ public class ProfileHtml extends IndexHtml {
     public ProfileHtml() {
         super()
         htmlDiv << "profile"
-        navigation= ["profile"]
+        navigation[0]= "profile"
     }
 
     public String getPageTitle() {
         def info= reader.getSteamIDInfo(queries.steamid64)
-        def name
-        if (info == null) {
-            name= "Invalid SteamID64"
-        } else {
-            name= info.name
-        }
+        def name= info == null ? "Invalid SteamID64" : info.name
         return "${super.getPageTitle()} - $name"
     }
 
