@@ -31,18 +31,6 @@ a {
     text-decoration:none;
 }
         
-h2 {
-    text-align:center;
-    font-size:32px;
-    font-weight:400;
-}
-
-h4 {
-    text-align:center;
-    font-size:18px; 
-    font-weight:400;            
-}
-        
 #wrap {          
     width:1280px;
     margin:0 auto;
@@ -81,7 +69,6 @@ h4 {
 #header select {
     display:inline;
     margin-right:10px;
-    text-transform: capitalize;
     font-family: 'Vollkorn', serif, Arial;
     font-size: 15px;
 }
@@ -95,8 +82,36 @@ h4 {
 .content-table {
     width: 720px;
     border-collapse: collapse;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.nav-list {
+    padding-left: 5px;
+    display: inline;
+    margin-right: 20px;
+}
+
+.odd-row {
+    background-color: #ffffff;
+}
+
+.even-row {
+    background-color: #eeeeee;
 }
 
 td {
     width:240px;
+    padding-left: 5px;
+}
+
+td+td {
+    text-align: center;
+}
+
+th {
+    text-align:left;
+    padding-left: 15px;
+    background-color: #4577d4;
+    color: #eeeeee;
 }

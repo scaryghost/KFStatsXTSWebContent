@@ -22,19 +22,29 @@ public class DataHtml extends Resource {
         
         switch(queryValues[Queries.table]) {
             case "totals":
-                xml.center() {
-                    table(tableAttr) {
-                        tbody() {
-                            WebCommon.generateSummary(reader).each {attr ->
-                                tr() {
-                                    td(attr['name'])
-                                    td(attr['value'])
-                                }
+                def odd= true
+                def fillTr= {
+                    [class: (odd ? "odd-row" : "even-row")]
+                }
+                xml.table(tableAttr) {
+                    thead() {
+                        tr() {
+                            th(colspan: "2") {
+                                h2("Server Totals")
                             }
-                            tr() {
-                                td(colspan: "2") {
-                                    a(href: "records.html", "View players")
-                                }
+                        }
+                    }
+                    tbody() {
+                        WebCommon.generateSummary(reader).each {attr ->
+                            tr(fillTr()) {
+                                td(attr['name'])
+                                td(attr['value'])
+                            }
+                            odd= !odd
+                        }
+                        tr(fillTr()) {
+                            td(colspan: "2") {
+                                a(href: "records.html", "View players")
                             }
                         }
                     }
@@ -48,49 +58,51 @@ public class DataHtml extends Resource {
                     xml.center("No records found for SteamID64: " + steamid64)
                 } else {
                     def steamIdInfo= reader.getSteamIDInfo(steamid64)
-
-                    xml.center() {
-                        table(tableAttr) {
-                            tbody() {
-                                tr() {
-                                    td("Name")
-                                    td(colspan: "2", steamIdInfo.name)
+                    xml.table(tableAttr) {
+                        thead() {
+                            tr() {
+                                th(colspan: "3") {
+                                    h2(steamIdInfo.name)
                                 }
-                                tr() {
-                                    td("Wins")
-                                    td(row.wins)
-                                    td(rowspan: "7", align: "center") {
-                                        img(src: steamIdInfo.avatar)
-                                    }
+                            }
+                        }
+                        tbody() {
+                            tr(class: "odd-row") {
+                                td("Wins")
+                                td(row.wins)
+                                td(rowspan: "7", align: "center") {
+                                    img(src: steamIdInfo.avatar)
                                 }
-                                tr() {
-                                    td("Losses")
-                                    td(row.losses)
-                                }
-                                tr() {
-                                    td("Disconnects")
-                                    td(row.disconnects)
-                                }
-                                tr() {
-                                    td("Finales Played")
-                                    td(row.finales_played)
-                                }
-                                tr() {
-                                    td("Finales Survived")
-                                    td(row.finales_survived)
-                                }
-                                tr() {
-                                    td("Time Connected")
-                                    td(Time.secToStr(row.time_connected))
-                                }
-                                tr() {
-                                    td(colspan: "2") {
-                                        a(target: "_blank", href: "http://steamcommunity.com/profiles/" + steamid64, "Steam Community Page")
-                                    }
-                                }
-                                tr() {
-                                    td(colspan:"3") {
-                                        a(target: "_blank", href: "matchhistory.html?steamid64=" + steamid64, "Match History")
+                            }
+                            tr(class: "even-row") {
+                                td("Losses")
+                                td(row.losses)
+                            }
+                            tr(class: "odd-row") {
+                                td("Disconnects")
+                                td(row.disconnects)
+                            }
+                            tr(class: "even-row") {
+                                td("Finales Played")
+                                td(row.finales_played)
+                            }
+                            tr(class: "odd-row") {
+                                td("Finales Survived")
+                                td(row.finales_survived)
+                            }
+                            tr(class: "even-row") {
+                                td("Time Connected")
+                                td(Time.secToStr(row.time_connected))
+                            }
+                            tr(class: "odd-row") {
+                                td(colspan: "2") {
+                                    ul(class: "nav-list") {
+                                        li(class: "nav-list") {
+                                            a(target: "_blank", href: "http://steamcommunity.com/profiles/" + steamid64, "Steam Community Page")
+                                        }
+                                        li(class: "nav-list") {
+                                            a(target: "_blank", href: "matchhistory.html?steamid64=" + steamid64, "Match History")
+                                        }
                                     }
                                 }
                             }
