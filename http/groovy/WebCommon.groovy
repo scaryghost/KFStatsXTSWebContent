@@ -36,7 +36,7 @@ public class WebCommon {
         function drawFilteredChart(data, title, divId, chartType) {
             var datatable= new google.visualization.DataTable(data);
             var dashboard= new google.visualization.Dashboard(document.getElementById(divId + '_dashboard_div'));
-            var donutRangeSlider = new google.visualization.ControlWrapper({
+            var chartController = new google.visualization.ControlWrapper({
                 'controlType': 'CategoryFilter',
                 'containerId': divId+'_filter_div',
                 'options': {
@@ -48,10 +48,19 @@ public class WebCommon {
                 'vAxis': {textStyle: {fontSize: 15}},
                 'allowHtml': true,
                 'title': title,
-                'height': Math.max(datatable.getNumberOfRows() * 25, document.getElementById(divId+"_dashboard_div").offsetHeight * 0.925),
+                'height': document.getElementById(divId+"_dashboard_div").offsetHeight * 0.925,
                 'width': document.getElementById(divId+"_dashboard_div").offsetWidth * 0.985
             }});
-            dashboard.bind(donutRangeSlider, chart);
+            //taken from https://groups.google.com/forum/?fromgroups#!topic/google-visualization-api/VcgHvrCrCNM
+            google.visualization.events.addListener(dashboard, 'ready', function() {
+                var numRows= chart.getDataTable().getNumberOfRows();
+                var expectedHeight = Math.max(numRows * 25, document.getElementById(divId+"_dashboard_div").offsetHeight * 0.925);
+                if (parseInt(chart.getOption('height'), 10) != expectedHeight) {
+                    chart.setOption('height', expectedHeight);
+                    chart.draw();
+                }
+            });
+            dashboard.bind(chartController, chart);
             dashboard.draw(datatable);
         }
 
@@ -61,12 +70,12 @@ public class WebCommon {
             var chart= new google.visualization.ChartWrapper({'chartType': chartType, 'containerId': divId, 'options': {
                 'chartArea': {height: '90%'},
                 'vAxis': {textStyle: {fontSize: 15}},
-                'allowHtml': true
+                'allowHtml': true,
+                'title': title,
+                'height': document.getElementById(divId).offsetHeight * 0.975,
+                'width': document.getElementById(divId).offsetWidth * 0.985
             }});
             chart.setDataTable(data);
-            chart.setOption('title', title);
-            chart.setOption('height', Math.max(chart.getDataTable().getNumberOfRows() * 25, document.getElementById(divId).offsetHeight * 0.975));
-            chart.setOption('width', document.getElementById(divId).offsetWidth * 0.985);
             chart.draw();
         }
     """
