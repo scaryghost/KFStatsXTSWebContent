@@ -3,6 +3,52 @@ import com.github.etsai.utils.Time
 import groovy.xml.MarkupBuilder
 
 public class WebCommon {
+    public static def aggregateCombineMatchHistory(def matchHistory, def orderByLevel) {
+        def aggregateData= [:]
+
+        matchHistory.each {row ->
+            def key
+            def diffKey= [row.difficulty, row.length]
+
+            key= orderByLevel ? row.level : diffKey
+            if (aggregateData[key] == null) {
+                aggregateData[key]= [:]
+                aggregateData[key]["time"]= 0
+            }
+            if (aggregateData[key][row.result] == null) {
+                aggregateData[key][row.result]= 0
+            }
+            aggregateData[key][row.result]++
+            aggregateData[key]["time"]+= row.duration
+        }
+        return aggregateData
+    }
+
+    public static def aggregateMatchHistory(def matchHistory, def orderByLevel) {
+        def aggregateData= [:]
+        matchHistory.each {row ->
+            def key1, key2
+            def diffKey= [row.difficulty, row.length]
+
+            key1= orderByLevel ? row.level : diffKey
+            key2= orderByLevel ? diffKey : row.level
+            
+            if (aggregateData[key1] == null) {
+                aggregateData[key1]= [:]
+            }
+            if (aggregateData[key1][key2] == null) {
+                aggregateData[key1][key2]= [:]
+                aggregateData[key1][key2]["time"]= 0
+            }
+            if (aggregateData[key1][key2][row.result] == null) {
+                aggregateData[key1][key2][row.result]= 0
+            }
+            aggregateData[key1][key2][row.result]++
+            aggregateData[key1][key2]["time"]+= row.duration
+        }
+        return aggregateData
+    }
+
     public static def partialQuery(reader, queryValues, records) {
         def pageSize= queryValues[Queries.rows].toInteger()
         def start= queryValues[Queries.page].toInteger() * pageSize

@@ -16,7 +16,8 @@ public class ProfileHtml extends IndexHtml {
     protected void buildXml(def builder) {
         def steamid64= queries.steamid64
         def profileAttr= reader.getRecord(steamid64)
-        
+        def matchHistory= reader.getMatchHistory(steamid64)
+
         builder.kfstatsx() {
             if (profileAttr == null) {
                 'error'("No stats available for steamdID64: ${steamid64}")
@@ -31,6 +32,44 @@ public class ProfileHtml extends IndexHtml {
                                 attr["formatted"]= Time.secToStr(attr.value)
                             }
                             'entry'(attr)
+                        }
+                    }
+
+                    'stats'(category: 'difficulties') {
+                        def aggregateDiffs= WebCommon.aggregateMatchHistory(matchHistory, false)
+                        WebCommon.aggregateCombineMatchHistory(matchHistory, false).each {key, stats ->
+                            def attr= stats
+
+                            attr.difficulty= key[0]
+                            attr.length= key[1]
+                            'entry'(attr) {
+                                aggregateDiffs[[key[0], key[1]]].each {levelName, levelStats ->
+                                    def levelAttrs= levelStats
+
+                                    levelAttrs["formatted-time"]= Time.secToStr(levelStats.time)
+                                    levelAttrs["name"]= levelName
+                                    'level'(levelAttrs)
+                                }
+                            }
+                        }
+                    }
+
+                    'stats'(category: 'levels') {
+                        def aggregateLevels= WebCommon.aggregateMatchHistory(matchHistory, true)
+                        WebCommon.aggregateCombineMatchHistory(matchHistory, true).each {key, stats ->
+                            def attr= stats
+    
+                            attr.level= key
+                            'entry'(attr) {
+                                aggregateLevels[key].each {diffSetting, diffStats ->
+                                    def diffAttrs= diffStats
+
+                                    diffAttrs["formatted-time"]= Time.secToStr(diffStats.time)
+                                    diffAttrs["name"]= diffSetting[0]
+                                    diffAttrs["length"]= diffSetting[1]
+                                    'difficulty'(diffAttrs)
+                                }
+                            }
                         }
                     }
                     reader.getAggregateCategories().each {category ->

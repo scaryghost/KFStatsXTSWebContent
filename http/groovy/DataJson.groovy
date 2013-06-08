@@ -22,7 +22,7 @@ public class DataJson extends Resource {
         def queryValues= Queries.parseQuery(queries)
 
         def matchHistoryResults= {stats ->
-            ["win", "loss", "disconnect", "duration"].collect {
+            ["win", "loss", "disconnect", "time"].collect {
                 [v: stats[it] == null ? 0 : stats[it]]
             }
         }
@@ -55,32 +55,20 @@ public class DataJson extends Resource {
                         [v: totals["time"], f: Time.secToStr(totals["time"]), p:[style: colStyle]],
                     ]]
                 } else {
-                    def difficulties= [:]
-                    reader.getMatchHistory(queryValues[Queries.steamid64]).each {row ->
-                        def difficulty= [row.difficulty, row.length]
-                        if (difficulties[difficulty] == null) {
-                            difficulties[difficulty]= [:]
-                            difficulties[difficulty]["duration"]= 0
-                        }
-                        if (difficulties[difficulty][row.result] == null) {
-                            difficulties[difficulty][row.result]= 0
-                        }
-                        difficulties[difficulty][row.result]++
-                        difficulties[difficulty]["duration"]+= row.duration
-                    }
+                    def difficulties= WebCommon.aggregateCombineMatchHistory(reader.getMatchHistory(queryValues[Queries.steamid64]), false)
 
                     columns= [["Name", "string"], ["Length", "string"], ["Wins", "number"],
                         ["Losses", "number"], ["Disconnects", "number"], ["Time", "number"]].collect {
                         [label: it[0], type: it[1]]
                     }
-                    def totals= [win: 0, loss: 0, disconnect:0, duration:0]
+                    def totals= [win: 0, loss: 0, disconnect:0, time:0]
                     difficulties.each {setting, stats ->
                         data << [c: [[v: setting[0], f:"<a href='javascript:open({\"table\":\"difficultydata\",\"difficulty\":\"${setting[0]}\",\"length\":\"${setting[1]}\",\"steamid64\":\"${queryValues[Queries.steamid64]}\"})'>${setting[0]}</a>"], [v: setting[1]]].plus(matchHistoryResults(stats))]
                         stats.each {stat, value ->
                             totals[stat]+= value
                         }
                     }
-                    data << [c: [[v: "Totals"], [v: "------"], [v: totals.win], [v: totals.loss], [v: totals.disconnect], [v: Time.secToStr(totals.duration)]]]
+                    data << [c: [[v: "Totals"], [v: "------"], [v: totals.win], [v: totals.loss], [v: totals.disconnect], [v: Time.secToStr(totals.time)]]]
                 }
                break
             case "levels":
@@ -105,30 +93,19 @@ public class DataJson extends Resource {
                         [v: totals["time"], f: Time.secToStr(totals["time"]), p:[style: colStyle]],
                     ]]
                 } else {
-                    def levels= [:]
-                    reader.getMatchHistory(queryValues[Queries.steamid64]).each {row ->
-                        if (levels[row.level] == null) {
-                            levels[row.level]= [:]
-                            levels[row.level]["duration"]= 0
-                        }
-                        if (levels[row.level][row.result] == null) {
-                            levels[row.level][row.result]= 0
-                        }
-                        levels[row.level][row.result]++
-                        levels[row.level]["duration"]+= row.duration
-                    }
+                    def levels= WebCommon.aggregateCombineMatchHistory(reader.getMatchHistory(queryValues[Queries.steamid64]), true)
 
                     columns= [["Name", "string"], ["Wins", "number"], ["Losses", "number"], ["Disconnects", "number"], ["Time", "number"]].collect {
                         [label: it[0], type: it[1]]
                     }
-                    def totals= [win: 0, loss: 0, disconnect:0, duration:0]
+                    def totals= [win: 0, loss: 0, disconnect:0, time:0]
                     levels.each {level, stats ->
                         data << [c: [[v: level, f:"<a href='javascript:open({\"table\":\"leveldata\",\"level\":\"${level}\",\"steamid64\":\"${queryValues[Queries.steamid64]}\"})'>${level}</a>"]].plus(matchHistoryResults(stats))]
                         stats.each {stat, value ->
                             totals[stat]+= value
                         }
                     }
-                    data << [c: [[v: "Totals"], [v: totals.win], [v: totals.loss], [v: totals.disconnect], [v: Time.secToStr(totals.duration)]]]
+                    data << [c: [[v: "Totals"], [v: totals.win], [v: totals.loss], [v: totals.disconnect], [v: Time.secToStr(totals.time)]]]
                 }
                 break
             case "leveldata":
@@ -155,34 +132,20 @@ public class DataJson extends Resource {
                         [v: totals["time"], f: Time.secToStr(totals["time"])],
                     ]]
                 } else {
-                    def leveldata= [:]
-                    reader.getMatchHistory(queryValues[Queries.steamid64]).each {row ->
-                        if (row.level == queryValues[Queries.level]) {
-                            def difficulty= [row.difficulty, row.length]
-                            if (leveldata[difficulty] == null) {
-                                leveldata[difficulty]= [:]
-                                leveldata[difficulty]["duration"]= 0
-                            }
-                            if (leveldata[difficulty][row.result] == null) {
-                                leveldata[difficulty][row.result]= 0
-                            }
-                            leveldata[difficulty][row.result]++
-                            leveldata[difficulty]["duration"]+= row.duration
-                        }
-                    }
+                    def leveldata= WebCommon.aggregateMatchHistory(reader.getMatchHistory(queryValues[Queries.steamid64]), true)
 
                     columns= [["Name", "string"], ["Length", "string"], ["Wins", "number"],
                         ["Losses", "number"], ["Disconnects", "number"], ["Time", "number"]].collect {
                         [label: it[0], type: it[1]]
                     }
-                    def totals= [win: 0, loss: 0, disconnect:0, duration:0]
-                    leveldata.each {setting, stats ->
+                    def totals= [win: 0, loss: 0, disconnect:0, time:0]
+                    leveldata[queryValues[Queries.level]].each {setting, stats ->
                         data << [c: [[v: setting[0]], [v: setting[1]]].plus(matchHistoryResults(stats))]
                         stats.each {stat, value ->
                             totals[stat]+= value
                         }
                     }
-                    data << [c: [[v: "Totals"], [v: "------"], [v: totals.win], [v: totals.loss], [v: totals.disconnect], [v: Time.secToStr(totals.duration)]]]
+                    data << [c: [[v: "Totals"], [v: "------"], [v: totals.win], [v: totals.loss], [v: totals.disconnect], [v: Time.secToStr(totals.time)]]]
                 }
                 break
             case "difficultydata":
@@ -207,32 +170,19 @@ public class DataJson extends Resource {
                         [v: totals["time"], f: Time.secToStr(totals["time"]), p:[style: colStyle]],
                     ]]
                 } else {
-                    def difficultydata= [:]
-                    reader.getMatchHistory(queryValues[Queries.steamid64]).each {row ->
-                        if (row.difficulty == queryValues[Queries.difficulty] && row.length == queryValues[Queries.length]) {
-                            if (difficultydata[row.level] == null) {
-                                difficultydata[row.level]= [:]
-                                difficultydata[row.level]["duration"]= 0
-                            }
-                            if (difficultydata[row.level][row.result] == null) {
-                                difficultydata[row.level][row.result]= 0
-                            }
-                            difficultydata[row.level][row.result]++
-                            difficultydata[row.level]["duration"]+= row.duration
-                        }
-                    }
+                    def difficultydata= WebCommon.aggregateMatchHistory(reader.getMatchHistory(queryValues[Queries.steamid64]), false)
 
                     columns= [["Name", "string"], ["Wins", "number"], ["Losses", "number"], ["Disconnects", "number"], ["Time", "number"]].collect {
                         [label: it[0], type: it[1]]
                     }
-                    def totals= [win: 0, loss: 0, disconnect:0, duration:0]
-                    difficultydata.each {level, stats ->
+                    def totals= [win: 0, loss: 0, disconnect:0, time:0]
+                    difficultydata[[queryValues[Queries.difficulty], queryValues[Queries.length]]].each {level, stats ->
                         data << [c: [[v: level]].plus(matchHistoryResults(stats))]
                         stats.each {stat, value ->
                             totals[stat]+= value
                         }
                     }
-                    data << [c: [[v: "Totals"], [v: totals.win], [v: totals.loss], [v: totals.disconnect], [v: Time.secToStr(totals.duration)]]]
+                    data << [c: [[v: "Totals"], [v: totals.win], [v: totals.loss], [v: totals.disconnect], [v: Time.secToStr(totals.time)]]]
                 }
                 break
             case "records":
