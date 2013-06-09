@@ -18,9 +18,8 @@ public class DataHtml extends Resource {
     public String generatePage() {
         def writer= new StringWriter()
         def xml= new MarkupBuilder(new IndentPrinter(new PrintWriter(writer), "", false))
-        def queryValues= Queries.parseQuery(queries)
         
-        switch(queryValues[Queries.table]) {
+        switch(queries.table) {
             case "totals":
                 def odd= true
                 def fillTr= {
@@ -51,7 +50,7 @@ public class DataHtml extends Resource {
                 }
                 break
             case "profile":
-                def steamid64= queryValues[Queries.steamid64]
+                def steamid64= queries.steamid64
                 def row= reader.getRecord(steamid64);
 
                 if (row == null) {

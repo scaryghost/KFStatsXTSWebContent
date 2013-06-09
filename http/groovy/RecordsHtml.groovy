@@ -12,21 +12,15 @@ public class RecordsHtml extends PagedTable {
     }
 
     protected void buildXml(def builder) {
-        def queryValues= Queries.parseQuery(queries)
         builder.kfstatsx() {
-            def pos= queryValues[Queries.page].toInteger() * queryValues[Queries.rows].toInteger()
-
             'aggregate'() {
                 builder.'stats'(category:'records') {
-                    WebCommon.partialQuery(reader, queryValues, true).each {row ->
+                    WebCommon.partialQuery(reader, queries, true).each {row ->
                         row.remove("id")
                         row.remove("record_id")
                         row.remove("avatar")
                         
-                        row["pos"]= pos + 1
-
                         builder.'record'(row)
-                        pos++
                     }
                 }
             }

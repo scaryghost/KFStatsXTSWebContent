@@ -18,12 +18,10 @@ public class MatchHistoryHtml extends PagedTable {
     }
 
     protected void buildXml(def builder) {
-        def queryValues= Queries.parseQuery(queries)
-
         builder.kfstatsx() {
             'profile'(steamid64: queries.steamid64) {
                 'stats'(category: "sessions") {
-                    WebCommon.partialQuery(reader, queryValues, false).each {row ->
+                    WebCommon.partialQuery(reader, queries, false).each {row ->
                         row.remove("record_id")
                         row.remove("level_id")
                         row.remove("difficulty_id")
