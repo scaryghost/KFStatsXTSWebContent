@@ -23,7 +23,13 @@ public class DataJson extends Resource {
 
         def matchHistoryResults= {stats ->
             ["win", "loss", "disconnect", "time"].collect {
-                [v: stats[it] == null ? 0 : stats[it]]
+                def fVal= (it == "time") ? Time.secToStr(stats[it]) : null
+                def elem= [v: stats[it] == null ? 0 : stats[it], p:[style: colStyle]]
+
+                if (fVal != null) {
+                    elem.f= fVal
+                }
+                elem
             }
         }
 
@@ -68,7 +74,8 @@ public class DataJson extends Resource {
                             totals[stat]+= value
                         }
                     }
-                    data << [c: [[v: "Totals"], [v: "------"], [v: totals.win], [v: totals.loss], [v: totals.disconnect], [v: Time.secToStr(totals.time)]]]
+                    data << [c: [[v: "Totals"], [v: "------"], [v: totals.win, p:[style: colStyle]], [v: totals.loss, p:[style: colStyle]], [v: totals.disconnect, p:[style: colStyle]], 
+                        [v: totals.time, f: Time.secToStr(totals.time), p:[style: colStyle]]]]
                 }
                break
             case "levels":
@@ -105,7 +112,8 @@ public class DataJson extends Resource {
                             totals[stat]+= value
                         }
                     }
-                    data << [c: [[v: "Totals"], [v: totals.win], [v: totals.loss], [v: totals.disconnect], [v: Time.secToStr(totals.time)]]]
+                    data << [c: [[v: "Totals"], [v: totals.win, p:[style: colStyle]], [v: totals.loss, p:[style: colStyle]], [v: totals.disconnect, p:[style: colStyle]], 
+                        [v: totals.time, f: totals.time, f: Time.secToStr(totals.time), p:[style: colStyle]]]]
                 }
                 break
             case "leveldata":
@@ -145,7 +153,8 @@ public class DataJson extends Resource {
                             totals[stat]+= value
                         }
                     }
-                    data << [c: [[v: "Totals"], [v: "------"], [v: totals.win], [v: totals.loss], [v: totals.disconnect], [v: Time.secToStr(totals.time)]]]
+                    data << [c: [[v: "Totals"], [v: "------"], [v: totals.win, p:[style: colStyle]], [v: totals.loss, p:[style: colStyle]], [v: totals.disconnect, p:[style: colStyle]], 
+                        [v: totals.time, f: Time.secToStr(totals.time), p:[style: colStyle]]]]
                 }
                 break
             case "difficultydata":
@@ -182,7 +191,8 @@ public class DataJson extends Resource {
                             totals[stat]+= value
                         }
                     }
-                    data << [c: [[v: "Totals"], [v: totals.win], [v: totals.loss], [v: totals.disconnect], [v: Time.secToStr(totals.time)]]]
+                    data << [c: [[v: "Totals"], [v: totals.win, p:[style: colStyle]], [v: totals.loss, p:[style: colStyle]], [v: totals.disconnect, p:[style: colStyle]], 
+                        [v: totals.time, f: Time.secToStr(totals.time), p:[style: colStyle]]]]
                 }
                 break
             case "records":

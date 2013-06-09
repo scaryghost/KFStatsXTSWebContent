@@ -91,7 +91,8 @@ public class WebCommon {
             });
             var chart= new google.visualization.ChartWrapper({'chartType': chartType, 'containerId': divId+"_chart_div", 'options': {
                 'chartArea': {height: '90%'},
-                'vAxis': {textStyle: {fontSize: 15}},
+                'vAxis': {title: 'Name', titleTextStyle: {color: 'red'}},
+                'hAxis': {title: 'Frequency', titleTextStyle: {color: 'red'}},
                 'allowHtml': true,
                 'title': title,
                 'height': document.getElementById(divId+"_dashboard_div").offsetHeight * 0.925,
@@ -106,6 +107,9 @@ public class WebCommon {
                     chart.draw();
                 }
             });
+            if (chartType != 'PieChart') {
+                chart.setOption('legend', {position: 'none'});
+            }
             dashboard.bind(chartController, chart);
             dashboard.draw(datatable);
         }

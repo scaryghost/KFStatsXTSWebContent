@@ -53,7 +53,7 @@ public class WaveDataHtml extends WebPageBase {
     }
 
     protected static def dasboardJs= """
-        function drawDashboard(data, category) {
+        function drawDashboard(data, category, title) {
             var divName= category + "_dashboard";
             var dashboard= new google.visualization.Dashboard(document.getElementById(divName + '_div'))
             var dataTable= new google.visualization.DataTable(data);
@@ -102,7 +102,11 @@ public class WaveDataHtml extends WebPageBase {
                   'height': document.getElementById(divName + '_div').offsetHeight * 0.9,
                   'width': document.getElementById(divName + '_div').offsetWidth * 0.975,
                   'legend': 'right',
-                  'pointSize': 5
+                  'curveType': 'function',
+                  'title': title,
+                  'pointSize': 5,
+                  'hAxis': {title: 'Wave', titleTextStyle: {color: 'red'}},
+                  'vAxis': {title: 'Frequency', titleTextStyle: {color: 'red'}}
                 }
             });
             dashboard.bind(donutRangeSlider, chart);
@@ -136,7 +140,7 @@ public class WaveDataHtml extends WebPageBase {
         def chartCalls= ""
         parameters.each {param ->
             if (param.size() == 2) {
-                chartCalls+= "            drawDashboard(${param[0]}, '${param[1]}');\n"
+                chartCalls+= "            drawDashboard(${param[0]}, '${param[1]}', '${param[1].capitalize()}');\n"
             } else {
                 chartCalls+= "            drawChart(${param[0]}, '${param[1]}', '${param[2]}', 'Table')\n"
             }
