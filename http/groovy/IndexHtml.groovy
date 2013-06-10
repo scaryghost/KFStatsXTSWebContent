@@ -15,15 +15,16 @@ public class IndexHtml extends WebPageBase {
     }
 
     protected void fillHeader(def builder) {
-        builder.h3("Navigation") {
-            select(onchange:'goto(this.options[this.selectedIndex].value); return false') {
-                navigation.each {item ->
-                    def divName= chartTypes[item] == null ? "#${item}_div" : "#${item}_dashboard_div" 
-                    def attr= [value: divName]
-                    if (item == navigation.first()) {
-                        attr["selected"]= "selected"
+        builder.ul(id: "menu") {
+            li() {
+                a("Navigation")
+                ul() {
+                    navigation.each {item ->
+                        def divName= chartTypes[item] == null ? "${item}_div" : "${item}_dashboard_div"
+                        li() {
+                            a(href: "javascript:goto(" + divName + ")", item.capitalize())
+                        }
                     }
-                    option(attr, item.capitalize())
                 }
             }
         }
@@ -79,6 +80,7 @@ public class IndexHtml extends WebPageBase {
                 modal: true,
                 width: document.getElementById('levels_div').offsetWidth * 0.985
             });
+            \$( "#menu" ).menu();
         });
         function open(opts) {
             \$( "#dialog" ).dialog( "option", "title", ("title" in opts) ? opts["title"] : opts["level"]);

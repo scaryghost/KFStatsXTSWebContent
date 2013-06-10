@@ -7,19 +7,29 @@ public class WaveDataHtml extends WebPageBase {
     public WaveDataHtml() {
         super()
         categoryMthd= "getWaveDataCategories"
+        stylesheets << 'http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css'
+        jsFiles << 'http://code.jquery.com/ui/1.10.3/jquery-ui.js'
     }
     public String getPageTitle() {
         return "${super.getPageTitle()} - Wave Data"
     }
 
     protected void fillHeader(def builder) {
-        builder.h3("Navigation") {
-            select(onchange:'goto(this.options[this.selectedIndex].value); return false') {
-                if (queries.level == null) {
-                    option(value: "#summary_div", selected: "selected", 'Summary')
-                }
-                navigation.each {item ->
-                    option(value: "#${item}_dashboard_div", item.capitalize())
+        builder.ul(id: "menu") {
+            li() {
+                a("Navigation")
+                ul() {
+                    if (queries.level == null) {
+                        li() {
+                            a(href: "javascript:goto(levels_div)", 'Levels')
+                        }
+                    }
+                    navigation.each {item ->
+                        def divName= "${item}_dashboard_div"
+                        li() {
+                            a(href: "javascript:goto(" + divName + ")", item.capitalize())
+                        }
+                    }
                 }
             }
         }
@@ -33,7 +43,7 @@ public class WaveDataHtml extends WebPageBase {
         }
         if (queries.level == null) {
             queries.table= "difficultydata"
-            parameters << [dataJson.generatePage(), 'Summary', 'summary_div']
+            parameters << [dataJson.generatePage(), 'Levels', 'levels_div']
         }
         builder.script(type: 'text/javascript') {
             mkp.yieldUnescaped(dashboardVisualization(parameters))
@@ -41,7 +51,7 @@ public class WaveDataHtml extends WebPageBase {
     }
     protected void fillContentBoxes(def builder) {
         if (queries.level == null) {
-            builder.div(id: 'summary_div', class: 'contentbox', '')
+            builder.div(id: 'levels_div', class: 'contentbox', '')
         }
         navigation.each {item ->
             builder.div(id: item + '_dashboard_div', class:'contentbox', '') {
@@ -52,7 +62,10 @@ public class WaveDataHtml extends WebPageBase {
         }
     }
 
-    protected static def dasboardJs= """
+    protected static def dashboardJs= """
+        \$(function() {
+            \$( "#menu" ).menu();
+        });
         function drawDashboard(data, category, title) {
             var divName= category + "_dashboard";
             var dashboard= new google.visualization.Dashboard(document.getElementById(divName + '_div'))
@@ -145,7 +158,7 @@ public class WaveDataHtml extends WebPageBase {
                 chartCalls+= "            drawChart(${param[0]}, '${param[1]}', '${param[2]}', 'Table')\n"
             }
         }
-        return "${WebCommon.chartJs}\n$dasboardJs$chartCalls        }\n    "
+        return "${WebCommon.chartJs}\n$dashboardJs$chartCalls        }\n    "
     }
 
     protected void buildXml(def builder) {
@@ -154,7 +167,7 @@ public class WaveDataHtml extends WebPageBase {
             attrs.remove('xml')
             builder.'wave-data'(attrs) {
                 if (queries.level == null) {
-                    'stats'(category: 'summary') {
+                    'stats'(category: 'levels') {
                         reader.getDifficultyData(queries.difficulty, queries.length).each {row ->
                             row["formatted-time"]= Time.secToStr(row.time)
                             'entry'(row)

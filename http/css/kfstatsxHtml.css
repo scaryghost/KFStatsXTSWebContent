@@ -119,3 +119,8 @@ th {
     background-color: #4577d4;
     color: #eeeeee;
 }
+
+.ui-menu {
+    width: 200px;
+    z-index: 1000;
+}

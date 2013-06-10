@@ -163,7 +163,7 @@ public class DataJson extends Resource {
                         [label: it[0], type: it[1]]
                     }
                     reader.getDifficultyData(queries.difficulty, queries.length).each {row ->
-                        data << [c: [[v: row.level], 
+                        data << [c: [[v: row.level, f:"<a href='wavedata.html?difficulty=${queries.difficulty}&length=${queries.length}&level=${row.level}'>${row.level}</a>"], 
                             [v: row.wins, p:[style: colStyle]],
                             [v: row.losses, p:[style: colStyle]],
                             [v: row.time, f: Time.secToStr(row.time), p:[style: colStyle]],
