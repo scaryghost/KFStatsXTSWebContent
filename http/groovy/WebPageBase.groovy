@@ -89,7 +89,7 @@ public abstract class WebPageBase extends Resource {
                         }
                     }
                     div(id:"footer") {
-                        a(id:'opener', href:'javascript:void(0)', onClick:'javascript:getXml()','View as xml')
+                        a(class: 'footer-link', id:'opener', href:'javascript:void(0)', onClick:'javascript:getXml()','View as xml')
                     }
                 }
             }
