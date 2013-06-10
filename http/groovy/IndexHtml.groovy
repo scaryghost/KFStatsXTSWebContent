@@ -81,11 +81,12 @@ public class IndexHtml extends WebPageBase {
             });
         });
         function open(opts) {
-            \$( "#dialog" ).dialog( "option", "title", opts["map"] );
+            \$( "#dialog" ).dialog( "option", "title", ("title" in opts) ? opts["title"] : opts["level"]);
             \$( "#dialog" ).dialog( "open" );
             
             var query= ""; 
             var keys= Object.keys(opts);
+            delete opts["title"];
             for(var index in keys) {
                 if (query.length != 0) {
                     query+= "&";

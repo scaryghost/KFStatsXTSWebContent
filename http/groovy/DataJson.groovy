@@ -68,7 +68,7 @@ public class DataJson extends Resource {
                     }
                     def totals= [win: 0, loss: 0, disconnect:0, time:0]
                     difficulties.each {setting, stats ->
-                        data << [c: [[v: setting[0], f:"<a href='javascript:open({\"table\":\"difficultydata\",\"difficulty\":\"${setting[0]}\",\"length\":\"${setting[1]}\",\"steamid64\":\"${queries.steamid64}\"})'>${setting[0]}</a>"], [v: setting[1]]].plus(matchHistoryResults(stats))]
+                        data << [c: [[v: setting[0], f:"<a href='javascript:open({\"table\":\"difficultydata\",\"title\":\"${setting[0]} - ${setting[1]}\",\"difficulty\":\"${setting[0]}\",\"length\":\"${setting[1]}\",\"steamid64\":\"${queries.steamid64}\"})'>${setting[0]}</a>"], [v: setting[1]]].plus(matchHistoryResults(stats))]
                         stats.each {stat, value ->
                             totals[stat]+= value
                         }
