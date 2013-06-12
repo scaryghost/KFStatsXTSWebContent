@@ -98,7 +98,7 @@ public class WebCommon {
             });
             var chart= new google.visualization.ChartWrapper({'chartType': chartType, 'containerId': divId+"_chart_div", 'options': {
                 'chartArea': {height: '90%'},
-                'vAxis': {title: 'Name', titleTextStyle: {color: 'red'}},
+                'vAxis': {title: 'Name', titleTextStyle: {color: 'red'}, textStyle: {fontSize: 15}},
                 'hAxis': {title: 'Frequency', titleTextStyle: {color: 'red'}},
                 'allowHtml': true,
                 'title': title,

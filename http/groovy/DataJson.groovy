@@ -36,7 +36,7 @@ public class DataJson extends Resource {
             case "difficulties":
                 if (queries.steamid64 == null) {
                     def totals= [wins: 0, losses: 0, time: 0]
-                    columns= [["Name", "string"], ["Length", "string"], ["Wins", "number"],
+                    columns= [["Difficulty", "string"], ["Length", "string"], ["Wins", "number"],
                         ["Losses", "number"], ["Avg Wave", "number"], ["Time", "number"]].collect {
                         [label: it[0], type: it[1]]
                     }
@@ -62,7 +62,7 @@ public class DataJson extends Resource {
                 } else {
                     def difficulties= WebCommon.aggregateCombineMatchHistory(reader.getMatchHistory(queries.steamid64), false)
 
-                    columns= [["Name", "string"], ["Length", "string"], ["Wins", "number"],
+                    columns= [["Difficulty", "string"], ["Length", "string"], ["Wins", "number"],
                         ["Losses", "number"], ["Disconnects", "number"], ["Time", "number"]].collect {
                         [label: it[0], type: it[1]]
                     }
@@ -80,7 +80,7 @@ public class DataJson extends Resource {
             case "levels":
                 if (queries.steamid64 == null) {
                     def totals= [wins: 0, losses: 0, time: 0]
-                    columns= [["Name", "string"], ["Wins", "number"], ["Losses", "number"], ["Time", "number"]].collect {
+                    columns= [["Level", "string"], ["Wins", "number"], ["Losses", "number"], ["Time", "number"]].collect {
                         [label: it[0], type: it[1]]
                     }
                     reader.getLevels().each {row ->
@@ -101,7 +101,7 @@ public class DataJson extends Resource {
                 } else {
                     def levels= WebCommon.aggregateCombineMatchHistory(reader.getMatchHistory(queries.steamid64), true)
 
-                    columns= [["Name", "string"], ["Wins", "number"], ["Losses", "number"], ["Disconnects", "number"], ["Time", "number"]].collect {
+                    columns= [["Level", "string"], ["Wins", "number"], ["Losses", "number"], ["Disconnects", "number"], ["Time", "number"]].collect {
                         [label: it[0], type: it[1]]
                     }
                     def totals= [win: 0, loss: 0, disconnect:0, time:0]
@@ -141,7 +141,7 @@ public class DataJson extends Resource {
                 } else {
                     def leveldata= WebCommon.aggregateMatchHistory(reader.getMatchHistory(queries.steamid64), true)
 
-                    columns= [["Name", "string"], ["Length", "string"], ["Wins", "number"],
+                    columns= [["Difficulty", "string"], ["Length", "string"], ["Wins", "number"],
                         ["Losses", "number"], ["Disconnects", "number"], ["Time", "number"]].collect {
                         [label: it[0], type: it[1]]
                     }
@@ -159,7 +159,7 @@ public class DataJson extends Resource {
             case "difficultydata":
                 if (queries.steamid64 == null) {
                     def totals= [wins: 0, losses: 0, time: 0]
-                    columns= [["Name", "string"], ["Wins", "number"], ["Losses", "number"], ["Time", "number"]].collect {
+                    columns= [["Level", "string"], ["Wins", "number"], ["Losses", "number"], ["Time", "number"]].collect {
                         [label: it[0], type: it[1]]
                     }
                     reader.getDifficultyData(queries.difficulty, queries.length).each {row ->
@@ -180,7 +180,7 @@ public class DataJson extends Resource {
                 } else {
                     def difficultydata= WebCommon.aggregateMatchHistory(reader.getMatchHistory(queries.steamid64), false)
 
-                    columns= [["Name", "string"], ["Wins", "number"], ["Losses", "number"], ["Disconnects", "number"], ["Time", "number"]].collect {
+                    columns= [["Level", "string"], ["Wins", "number"], ["Losses", "number"], ["Disconnects", "number"], ["Time", "number"]].collect {
                         [label: it[0], type: it[1]]
                     }
                     def totals= [win: 0, loss: 0, disconnect:0, time:0]
