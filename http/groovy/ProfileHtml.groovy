@@ -9,29 +9,32 @@ public class ProfileHtml extends IndexHtml {
 
     public String getPageTitle() {
         def info= reader.getSteamIDInfo(queries.steamid64)
-        def name= info == null ? "Invalid SteamID64" : info.name
+        def name= info == null ? "Player Not Found" : info.name
         return "${super.getPageTitle()} - $name"
     }
 
     protected void buildXml(def builder) {
         def steamid64= queries.steamid64
-        def profileAttr= reader.getRecord(steamid64)
+        def record= reader.getRecord(steamid64)
         def matchHistory= reader.getMatchHistory(steamid64)
 
         builder.kfstatsx() {
-            if (profileAttr == null) {
+            if (record == null) {
                 'error'("No stats available for steamdID64: ${steamid64}")
             } else {
-                profileAttr.remove('steamid64')
-                profileAttr.putAll(reader.getSteamIDInfo(steamid64))
+                def steamInfo= reader.getSteamIDInfo(steamid64)
+                def profileAttr= [steamid64: steamid64, name: steamInfo.name, avatar: steamInfo.avatar, wins: record.wins, losses: record.losses,
+                        disconnects: record.disconnects, finales_played: record.finales_played, finales_survived: record.finales_survived,
+                        time: record.time]
                 'profile'(steamid64: steamid64) {
                     'stats'(category: 'profile') {
                         profileAttr.each {
                             def attr= [stat: it.getKey(), value: it.getValue()]
-                            if (attr.stat.toLowerCase().contains("time")) {
-                                attr["formatted"]= Time.secToStr(attr.value)
+                            'entry'(attr) {
+                                if (attr.stat.toLowerCase().contains("time")) {
+                                    'formatted-time'(Time.secToStr(attr.value))
+                                }
                             }
-                            'entry'(attr)
                         }
                     }
 
@@ -46,9 +49,10 @@ public class ProfileHtml extends IndexHtml {
                                 aggregateDiffs[[key[0], key[1]]].each {levelName, levelStats ->
                                     def levelAttrs= levelStats
 
-                                    levelAttrs["formatted-time"]= Time.secToStr(levelStats.time)
                                     levelAttrs["name"]= levelName
-                                    'level'(levelAttrs)
+                                    'level'(levelAttrs) {
+                                        'formatted-time'(Time.secToStr(levelStats.time))
+                                    }
                                 }
                             }
                         }
@@ -64,24 +68,24 @@ public class ProfileHtml extends IndexHtml {
                                 aggregateLevels[key].each {diffSetting, diffStats ->
                                     def diffAttrs= diffStats
 
-                                    diffAttrs["formatted-time"]= Time.secToStr(diffStats.time)
                                     diffAttrs["name"]= diffSetting[0]
                                     diffAttrs["length"]= diffSetting[1]
-                                    'difficulty'(diffAttrs)
+                                    'difficulty'(diffAttrs) {
+                                        'formatted-time'(Time.secToStr(diffStats.time))
+                                    }
                                 }
                             }
                         }
                     }
-                    reader.getAggregateCategories().each {category ->
+                    reader.getStatCategories().each {category ->
                         'stats'(category: category) {
                             reader.getAggregateData(category, steamid64).each {row ->
-                                def attr= row
-                                if (category == "perks" || attr.stat.toLowerCase().contains("time")) {
-                                    attr["formatted"]= Time.secToStr(attr["value"])
+                                def attr= [stat: row.stat, value: row.value]
+                                builder.'entry'(attr) {
+                                    if (category == "perks" || attr.stat.toLowerCase().contains("time")) {
+                                        'formatted-time'(Time.secToStr(attr["value"]))
+                                    }
                                 }
-                                attr.remove("record_id")
-                                attr.remove("category")
-                                builder.'entry'(attr)
                             }
                         }
                     }

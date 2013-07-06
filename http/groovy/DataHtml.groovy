@@ -91,7 +91,7 @@ public class DataHtml extends Resource {
                             }
                             tr(class: "even-row") {
                                 td("Time Connected")
-                                td(Time.secToStr(row.time_connected))
+                                td(Time.secToStr(row.time))
                             }
                             tr(class: "odd-row") {
                                 td(colspan: "2") {

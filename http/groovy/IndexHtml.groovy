@@ -9,7 +9,7 @@ public class IndexHtml extends WebPageBase {
         super()
         htmlDiv << "totals"
         navigation= ["totals", "difficulties", "levels"]
-        categoryMthd= "getAggregateCategories"
+        categoryMthd= "getStatCategories"
         stylesheets << 'http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css'
         jsFiles << 'http://code.jquery.com/ui/1.10.3/jquery-ui.js'
     }
@@ -117,62 +117,65 @@ $chartCalls
                         'entry'(attr)
                     }
                 }
-            
                 builder.'stats'(category:"difficulties") {
                     def accum= [wins: 0, losses: 0, time: 0]
-                    reader.getDifficulties().each {row ->
-                        def result= row
+                    reader.getDifficulties().each {diffiulty ->
+                        def attr= [name: diffiulty.name, length: diffiulty.length, wins: diffiulty.wins, losses: diffiulty.losses, time: diffiulty.time]
                         accum.keySet().each {key ->
-                            accum[key]+= row[key]
+                            accum[key]+= attr[key]
                         }
     
-                        result["avg-wave"]= String.format("%.2f", result.waveaccum / (row.wins + row.losses))
-                        result["formatted-time"]= Time.secToStr(row.time)
-                        result.remove("waveaccum")
-                        'entry'(result)
+                        attr["avg-wave"]= String.format("%.2f", diffiulty.wave_sum / (diffiulty.wins + diffiulty.losses))
+                        'entry'(attr) {
+                            reader.getDifficultyData(diffiulty.name, diffiulty.length).each {data ->
+                                def dataAttr= [name: data.level, wins: data.wins, losses: data.losses, time: data.time]
+                                dataAttr["avg-wave"]= String.format("%.2f", data.wave_sum / (data.wins + data.losses))
+                                builder.'difficulty'(dataAttr) {
+                                    'formatted-time'(Time.secToStr(data.time))
+                                }
+                            }
+                            'formatted-time'(Time.secToStr(diffiulty.time))
+                        }
                     }
                 
                     accum.name= "Total"
-                    accum.length= ""
-                    accum["avg-wave"]= ""
-                    accum["formatted-time"]= Time.secToStr(accum.time)
-                    total(accum)
+                    total(accum) {
+                        'formatted-time'(Time.secToStr(accum.time))
+                    }
                 }
                 builder.'stats'(category:"levels") {
                     def accum= [wins: 0, losses: 0, time: 0]
-                    reader.getLevels().each {row ->
-                        def result= row
+                    reader.getLevels().each {level ->
+                        def levelAttr= [name: level.name, wins: level.wins, losses: level.losses, time: level.time]
                         accum.keySet().each {key ->
-                            accum[key]+= row[key]
+                            accum[key]+= levelAttr[key]
                         }
                         
-                        result["formatted-time"]= Time.secToStr(result.time)
-                        'entry'(result) {
-                            reader.getLevelData(result.level).each {difficulty ->
-                                accum.keySet().each {key ->
-                                    accum[key]+= row[key]
+                        'entry'(levelAttr) {
+                            'formatted-time'(Time.secToStr(accum.time))
+                            reader.getLevelData(level.name).each {data ->
+                                def dataAttr= [name: data.difficulty, length: data.length, wins: data.wins, losses: data.losses, time: data.time]
+                                dataAttr["avg-wave"]= String.format("%.2f", data.wave_sum / (data.wins + data.losses))
+                                builder.'difficulty'(dataAttr) {
+                                    'formatted-time'(Time.secToStr(data.time))
                                 }
-
-                                difficulty["avg-wave"]= String.format("%.2f", difficulty.waveaccum / (row.wins + row.losses))
-                                difficulty["formatted-time"]= Time.secToStr(row.time)
-                                difficulty.remove("waveaccum")
-                                builder.'difficulty'(difficulty)
                             }
                         }
                     }
                     accum.name= "Total"
-                    accum["formatted-time"]= Time.secToStr(accum.time)
-                    'total'(accum)
+                    'total'(accum) {
+                        'formatted-time'(Time.secToStr(accum.time))
+                    }
                 }
-                reader.getAggregateCategories().each {category ->
+                reader.getStatCategories().each {category ->
                     builder.'stats'(category: category) {
-                        reader.getAggregateData(category).each {row ->
-                            def attr= row
-                            if (category == "perks" || attr.stat.toLowerCase().contains("time")) {
-                                attr["formatted"]= Time.secToStr(attr["value"])
+                        reader.getAggregateData(category).each {stat ->
+                            def attr= [stat: stat.stat, value: stat.value]
+                            'entry'(attr) {
+                                if (category == "perks" || stat.stat.toLowerCase().contains("time")) {
+                                    'formatted-time'(Time.secToStr(stat.value))
+                                }
                             }
-                            attr.remove("category")
-                            'entry'(attr)
                         }
                     }
                 }

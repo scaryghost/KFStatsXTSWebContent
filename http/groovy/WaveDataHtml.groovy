@@ -163,14 +163,20 @@ public class WaveDataHtml extends WebPageBase {
 
     protected void buildXml(def builder) {
         builder.kfstatsx() {
-            def attrs= queries.clone()
-            attrs.remove('xml')
-            builder.'wave-data'(attrs) {
+            def waveDataAttr= [difficulty: queries.difficulty, length: queries.length]
+
+            if (queries.level != null) {
+                waveDataAttr.level= queries.level
+            }
+            builder.'wave-data'(waveDataAttr) {
                 if (queries.level == null) {
                     'stats'(category: 'levels') {
-                        reader.getDifficultyData(queries.difficulty, queries.length).each {row ->
-                            row["formatted-time"]= Time.secToStr(row.time)
-                            'entry'(row)
+                        reader.getDifficultyData(queries.difficulty, queries.length).each {data ->
+                            def dataAttr= [name: data.level, wins: data.wins, losses: data.losses, time:data.time, 
+                                "avg-wave": String.format("%.2f", data.wave_sum / (data.wins + data.losses))]
+                            'entry'(dataAttr) {
+                                'formatted-time'(Time.secToStr(data.time))
+                            }
                         }
                     }
                 }
@@ -188,8 +194,8 @@ public class WaveDataHtml extends WebPageBase {
                         waves.each {wave, stats ->
                             builder.'wave'(num: wave) {
                                 stats.each {stat ->
-                                    stat.remove('wave')
-                                    'entry'(stat)
+                                    def statAttr= [stat: stat.stat, value: stat.value]
+                                    'entry'(statAttr)
                                 }
                             }
                         }

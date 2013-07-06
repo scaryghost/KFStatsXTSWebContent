@@ -41,11 +41,12 @@ public class DataJson extends Resource {
                         [label: it[0], type: it[1]]
                     }
                     reader.getDifficulties().each {row ->
-                        data << [c: [[v: row.difficulty, f:"<a href='wavedata.html?difficulty=${row.difficulty}&length=${row.length}'>${row.difficulty}</a>"], 
+                        def avgWave= row.wave_sum / (row.wins + row.losses)
+                        data << [c: [[v: row.name, f:"<a href='wavedata.html?difficulty=${row.name}&length=${row.length}'>${row.name}</a>"], 
                             [v: row.length, p:[style: colStyle]],
                             [v: row.wins, p:[style: colStyle]],
                             [v: row.losses, p:[style: colStyle]],
-                            [v: String.format("%.2f",row.waveaccum / (row.wins + row.losses)), p:[style: colStyle]],
+                            [v: avgWave, f: String.format("%.2f", avgWave), p:[style: colStyle]],
                             [v: row.time, f: Time.secToStr(row.time), p:[style: colStyle]]
                         ]]
                         totals["wins"]+= row.wins
@@ -53,10 +54,10 @@ public class DataJson extends Resource {
                         totals["time"]+= row.time
                     }
                     data << [c: [[v: "Totals"], 
-                        [v: "", f: "---", p:[style: colStyle]],
+                        [v: "", f: "------", p:[style: colStyle]],
                         [v: totals["wins"], p:[style: colStyle]],
                         [v: totals["losses"], p:[style: colStyle]],
-                        [v: 0, f: "---", p:[style: colStyle]],
+                        [v: 0, f: "------", p:[style: colStyle]],
                         [v: totals["time"], f: Time.secToStr(totals["time"]), p:[style: colStyle]],
                     ]]
                 } else {
@@ -84,14 +85,14 @@ public class DataJson extends Resource {
                         [label: it[0], type: it[1]]
                     }
                     reader.getLevels().each {row ->
-                        data << [c: [[v: row.level, f:"<a href='javascript:open({\"table\":\"leveldata\",\"level\":\"${row.level}\"})'>${row.level}</a>"], 
+                        data << [c: [[v: row.name, f:"<a href='javascript:open({\"table\":\"leveldata\",\"level\":\"${row.name}\"})'>${row.name}</a>"], 
                             [v: row.wins, p:[style: colStyle]],
                             [v: row.losses, p:[style: colStyle]],
                             [v: row.time, f: Time.secToStr(row.time), p:[style: colStyle]],
                         ]]
                         totals["wins"]+= row.wins
                         totals["losses"]+= row.losses
-                        totals["time"]+= row.time.toInteger()
+                        totals["time"]+= row.time
                     }
                     data << [c: [[v: "Totals"], 
                         [v: totals["wins"], p:[style: colStyle]],
@@ -122,7 +123,7 @@ public class DataJson extends Resource {
                         [label: it[0], type: it[1]]
                     }
                     reader.getLevelData(queries.level).each {row ->
-                        def avgWave= row.waveaccum / (row.wins + row.losses)
+                        def avgWave= row.wave_sum / (row.wins + row.losses)
                         data << [c: [[v: row.difficulty, f:"<a href='wavedata.html?difficulty=${row.difficulty}&length=${row.length}&level=${queries.level}' style='color:#0073BF'>${row.difficulty}</a>"], 
                                 [v:row.length], [v: row.wins], [v: row.losses], [v:avgWave, f: String.format("%.2f",avgWave)], 
                                 [v:row.time, f: Time.secToStr(row.time)]
@@ -158,24 +159,30 @@ public class DataJson extends Resource {
                 break
             case "difficultydata":
                 if (queries.steamid64 == null) {
-                    def totals= [wins: 0, losses: 0, time: 0]
-                    columns= [["Level", "string"], ["Wins", "number"], ["Losses", "number"], ["Time", "number"]].collect {
+                    def totals= [wins: 0, losses: 0, time: 0, wave_sum: 0]
+                    columns= [["Level", "string"], ["Wins", "number"], ["Losses", "number"], ["Avg Wave", "number"], ["Time", "number"]].collect {
                         [label: it[0], type: it[1]]
                     }
                     reader.getDifficultyData(queries.difficulty, queries.length).each {row ->
+                        def avgWave= row.wave_sum / (row.wins + row.losses)
+
                         data << [c: [[v: row.level, f:"<a href='wavedata.html?difficulty=${queries.difficulty}&length=${queries.length}&level=${row.level}'>${row.level}</a>"], 
                             [v: row.wins, p:[style: colStyle]],
                             [v: row.losses, p:[style: colStyle]],
-                            [v: row.time, f: Time.secToStr(row.time), p:[style: colStyle]],
+                            [v: avgWave, f: String.format("%.2f", avgWave), p:[style: colStyle]],
+                            [v: row.time, f: Time.secToStr(row.time), p:[style: colStyle]]
                         ]]
-                        totals["wins"]+= row.wins
-                        totals["losses"]+= row.losses
-                        totals["time"]+= row.time.toInteger()
+                        totals.wins+= row.wins
+                        totals.losses+= row.losses
+                        totals.time+= row.time
+                        totals.wave_sum+= row.wave_sum
                     }
+                    def totalAvgWave= totals.wave_sum / (totals.wins + totals.losses)
                     data << [c: [[v: "Totals"], 
-                        [v: totals["wins"], p:[style: colStyle]],
-                        [v: totals["losses"], p:[style: colStyle]],
-                        [v: totals["time"], f: Time.secToStr(totals["time"]), p:[style: colStyle]],
+                        [v: totals.wins, p:[style: colStyle]],
+                        [v: totals.losses, p:[style: colStyle]],
+                        [v: totalAvgWave, f: String.format("%.2f", totalAvgWave), p:[style: colStyle]],
+                        [v: totals.time, f: Time.secToStr(totals["time"]), p:[style: colStyle]]
                     ]]
                 } else {
                     def difficultydata= WebCommon.aggregateMatchHistory(reader.getMatchHistory(queries.steamid64), false)
@@ -196,16 +203,17 @@ public class DataJson extends Resource {
                 break
             case "records":
                 columns= [["name", "Name", "string"], ["wins", "Wins", "number"], ["losses", "Losses", "number"], ["disconnects", "Disconnects", "number"], 
-                ["time_connected", "Time Connected", "numner"]].collect {
+                ["time", "Time Connected", "numner"]].collect {
                     [id: it[0], label: it[1], type: it[2]]
                 }
 
                 WebCommon.partialQuery(reader, queries, true).each {row -> 
-                    data << [c: [[v: row.name, f: "<a href=profile.html?steamid64=${row.steamid64}>${row.name}</a>"], 
+                    def steamInfo= reader.getSteamIDInfo(row.steamid64)
+                    data << [c: [[v: steamInfo.name, f: "<a href=profile.html?steamid64=${row.steamid64}>${steamInfo.name}</a>"], 
                         [v: row.wins, p:[style: colStyle]],
                         [v: row.losses, p:[style: colStyle]],
                         [v: row.disconnects, p:[style: colStyle]],
-                        [v: row.time_connected, f: Time.secToStr(row.time_connected), p:[style: colStyle]]]]
+                        [v: row.time, f: Time.secToStr(row.time), p:[style: colStyle]]]]
                 }
                 break
             case "matchhistory":

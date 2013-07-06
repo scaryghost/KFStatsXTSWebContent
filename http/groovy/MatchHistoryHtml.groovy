@@ -21,11 +21,9 @@ public class MatchHistoryHtml extends PagedTable {
         builder.kfstatsx() {
             'profile'(steamid64: queries.steamid64) {
                 'stats'(category: "sessions") {
-                    WebCommon.partialQuery(reader, queries, false).each {row ->
-                        row.remove("record_id")
-                        row.remove("level_id")
-                        row.remove("difficulty_id")
-                        'entry'(row)
+                    WebCommon.partialQuery(reader, queries, false).each {match ->
+                        'entry'(level: match.level, difficulty: match.difficulty, length: match.length, result: match.result, wave: match.wave, 
+                            duration: match.duration, timestamp: match.timestamp)
                     }
                 }
             }
