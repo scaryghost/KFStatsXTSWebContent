@@ -13,7 +13,7 @@ import groovy.json.JsonBuilder
  * @author etsai
  */
 public class DataJson extends Resource {
-    private static def colStyle= "text-align:center"
+    private static def centerAlign= [style: "text-align:center"], leftAlign= [style: "text-align:left"]
     
     public String generatePage() {
         def columns
@@ -23,7 +23,7 @@ public class DataJson extends Resource {
         def matchHistoryResults= {stats ->
             ["win", "loss", "disconnect", "time"].collect {
                 def fVal= (it == "time") ? Time.secToStr(stats[it]) : null
-                def elem= [v: stats[it] == null ? 0 : stats[it], p:[style: colStyle]]
+                def elem= [v: stats[it] == null ? 0 : stats[it], p: centerAlign]
 
                 if (fVal != null) {
                     elem.f= fVal
@@ -43,22 +43,22 @@ public class DataJson extends Resource {
                     reader.getDifficulties().each {row ->
                         def avgWave= row.wave_sum / (row.wins + row.losses)
                         data << [c: [[v: row.name, f:"<a href='wavedata.html?difficulty=${row.name}&length=${row.length}'>${row.name}</a>"], 
-                            [v: row.length, p:[style: colStyle]],
-                            [v: row.wins, p:[style: colStyle]],
-                            [v: row.losses, p:[style: colStyle]],
-                            [v: avgWave, f: String.format("%.2f", avgWave), p:[style: colStyle]],
-                            [v: row.time, f: Time.secToStr(row.time), p:[style: colStyle]]
+                            [v: row.length, p: centerAlign],
+                            [v: row.wins, p: centerAlign],
+                            [v: row.losses, p: centerAlign],
+                            [v: avgWave, f: String.format("%.2f", avgWave), p: centerAlign],
+                            [v: row.time, f: Time.secToStr(row.time), p: centerAlign]
                         ]]
                         totals["wins"]+= row.wins
                         totals["losses"]+= row.losses
                         totals["time"]+= row.time
                     }
                     data << [c: [[v: "Totals"], 
-                        [v: "", f: "------", p:[style: colStyle]],
-                        [v: totals["wins"], p:[style: colStyle]],
-                        [v: totals["losses"], p:[style: colStyle]],
-                        [v: 0, f: "------", p:[style: colStyle]],
-                        [v: totals["time"], f: Time.secToStr(totals["time"]), p:[style: colStyle]],
+                        [v: "", f: "------", p: centerAlign],
+                        [v: totals["wins"], p: centerAlign],
+                        [v: totals["losses"], p: centerAlign],
+                        [v: 0, f: "------", p: centerAlign],
+                        [v: totals["time"], f: Time.secToStr(totals["time"]), p: centerAlign],
                     ]]
                 } else {
                     def difficulties= WebCommon.aggregateCombineMatchHistory(reader.getMatchHistory(queries.steamid64), false)
@@ -74,8 +74,8 @@ public class DataJson extends Resource {
                             totals[stat]+= value
                         }
                     }
-                    data << [c: [[v: "Totals"], [v: "------"], [v: totals.win, p:[style: colStyle]], [v: totals.loss, p:[style: colStyle]], [v: totals.disconnect, p:[style: colStyle]], 
-                        [v: totals.time, f: Time.secToStr(totals.time), p:[style: colStyle]]]]
+                    data << [c: [[v: "Totals"], [v: "------"], [v: totals.win, p: centerAlign], [v: totals.loss, p: centerAlign], [v: totals.disconnect, p: centerAlign], 
+                        [v: totals.time, f: Time.secToStr(totals.time), p: centerAlign]]]
                 }
                break
             case "levels":
@@ -86,18 +86,18 @@ public class DataJson extends Resource {
                     }
                     reader.getLevels().each {row ->
                         data << [c: [[v: row.name, f:"<a href='javascript:open({\"table\":\"leveldata\",\"level\":\"${row.name}\"})'>${row.name}</a>"], 
-                            [v: row.wins, p:[style: colStyle]],
-                            [v: row.losses, p:[style: colStyle]],
-                            [v: row.time, f: Time.secToStr(row.time), p:[style: colStyle]],
+                            [v: row.wins, p: centerAlign],
+                            [v: row.losses, p: centerAlign],
+                            [v: row.time, f: Time.secToStr(row.time), p: centerAlign],
                         ]]
                         totals["wins"]+= row.wins
                         totals["losses"]+= row.losses
                         totals["time"]+= row.time
                     }
                     data << [c: [[v: "Totals"], 
-                        [v: totals["wins"], p:[style: colStyle]],
-                        [v: totals["losses"], p:[style: colStyle]],
-                        [v: totals["time"], f: Time.secToStr(totals["time"]), p:[style: colStyle]],
+                        [v: totals["wins"], p: centerAlign],
+                        [v: totals["losses"], p: centerAlign],
+                        [v: totals["time"], f: Time.secToStr(totals["time"]), p: centerAlign],
                     ]]
                 } else {
                     def levels= WebCommon.aggregateCombineMatchHistory(reader.getMatchHistory(queries.steamid64), true)
@@ -112,8 +112,8 @@ public class DataJson extends Resource {
                             totals[stat]+= value
                         }
                     }
-                    data << [c: [[v: "Totals"], [v: totals.win, p:[style: colStyle]], [v: totals.loss, p:[style: colStyle]], [v: totals.disconnect, p:[style: colStyle]], 
-                        [v: totals.time, f: totals.time, f: Time.secToStr(totals.time), p:[style: colStyle]]]]
+                    data << [c: [[v: "Totals"], [v: totals.win, p: centerAlign], [v: totals.loss, p: centerAlign], [v: totals.disconnect, p: centerAlign], 
+                        [v: totals.time, f: totals.time, f: Time.secToStr(totals.time), p: centerAlign]]]
                 }
                 break
             case "leveldata":
@@ -153,8 +153,8 @@ public class DataJson extends Resource {
                             totals[stat]+= value
                         }
                     }
-                    data << [c: [[v: "Totals"], [v: "------"], [v: totals.win, p:[style: colStyle]], [v: totals.loss, p:[style: colStyle]], [v: totals.disconnect, p:[style: colStyle]], 
-                        [v: totals.time, f: Time.secToStr(totals.time), p:[style: colStyle]]]]
+                    data << [c: [[v: "Totals"], [v: "------"], [v: totals.win, p: centerAlign], [v: totals.loss, p: centerAlign], [v: totals.disconnect, p: centerAlign], 
+                        [v: totals.time, f: Time.secToStr(totals.time), p: centerAlign]]]
                 }
                 break
             case "difficultydata":
@@ -167,10 +167,10 @@ public class DataJson extends Resource {
                         def avgWave= row.wave_sum / (row.wins + row.losses)
 
                         data << [c: [[v: row.level, f:"<a href='wavedata.html?difficulty=${queries.difficulty}&length=${queries.length}&level=${row.level}'>${row.level}</a>"], 
-                            [v: row.wins, p:[style: colStyle]],
-                            [v: row.losses, p:[style: colStyle]],
-                            [v: avgWave, f: String.format("%.2f", avgWave), p:[style: colStyle]],
-                            [v: row.time, f: Time.secToStr(row.time), p:[style: colStyle]]
+                            [v: row.wins, p: centerAlign],
+                            [v: row.losses, p: centerAlign],
+                            [v: avgWave, f: String.format("%.2f", avgWave), p: centerAlign],
+                            [v: row.time, f: Time.secToStr(row.time), p: centerAlign]
                         ]]
                         totals.wins+= row.wins
                         totals.losses+= row.losses
@@ -179,10 +179,10 @@ public class DataJson extends Resource {
                     }
                     def totalAvgWave= totals.wave_sum / (totals.wins + totals.losses)
                     data << [c: [[v: "Totals"], 
-                        [v: totals.wins, p:[style: colStyle]],
-                        [v: totals.losses, p:[style: colStyle]],
-                        [v: totalAvgWave, f: String.format("%.2f", totalAvgWave), p:[style: colStyle]],
-                        [v: totals.time, f: Time.secToStr(totals["time"]), p:[style: colStyle]]
+                        [v: totals.wins, p: centerAlign],
+                        [v: totals.losses, p: centerAlign],
+                        [v: totalAvgWave, f: String.format("%.2f", totalAvgWave), p: centerAlign],
+                        [v: totals.time, f: Time.secToStr(totals["time"]), p: centerAlign]
                     ]]
                 } else {
                     def difficultydata= WebCommon.aggregateMatchHistory(reader.getMatchHistory(queries.steamid64), false)
@@ -197,8 +197,8 @@ public class DataJson extends Resource {
                             totals[stat]+= value
                         }
                     }
-                    data << [c: [[v: "Totals"], [v: totals.win, p:[style: colStyle]], [v: totals.loss, p:[style: colStyle]], [v: totals.disconnect, p:[style: colStyle]], 
-                        [v: totals.time, f: Time.secToStr(totals.time), p:[style: colStyle]]]]
+                    data << [c: [[v: "Totals"], [v: totals.win, p: centerAlign], [v: totals.loss, p: centerAlign], [v: totals.disconnect, p: centerAlign], 
+                        [v: totals.time, f: Time.secToStr(totals.time), p: centerAlign]]]
                 }
                 break
             case "records":
@@ -209,11 +209,11 @@ public class DataJson extends Resource {
 
                 WebCommon.partialQuery(reader, queries, true).each {row -> 
                     def steamInfo= reader.getSteamIDInfo(row.steamid64)
-                    data << [c: [[v: steamInfo.name, f: "<a href=profile.html?steamid64=${row.steamid64}>${steamInfo.name}</a>"], 
-                        [v: row.wins, p:[style: colStyle]],
-                        [v: row.losses, p:[style: colStyle]],
-                        [v: row.disconnects, p:[style: colStyle]],
-                        [v: row.time, f: Time.secToStr(row.time), p:[style: colStyle]]]]
+                    data << [c: [[v: steamInfo.name, f: "<a href=profile.html?steamid64=${row.steamid64}>${steamInfo.name}</a>", p: leftAlign], 
+                        [v: row.wins, p: centerAlign],
+                        [v: row.losses, p: centerAlign],
+                        [v: row.disconnects, p: centerAlign],
+                        [v: row.time, f: Time.secToStr(row.time), p: centerAlign]]]
                 }
                 break
             case "matchhistory":
@@ -222,13 +222,13 @@ public class DataJson extends Resource {
                     [id: it[0], label: it[0], type: it[1]]
                 }
                 WebCommon.partialQuery(reader, queries, false).each {row ->
-                    data << [c: [[v: row.level], 
-                        [v: row.difficulty, p:[style: colStyle]],
-                        [v: row.length, p:[style: colStyle]],
-                        [v: row.result, p:[style: colStyle]],
-                        [v: row.wave, p:[style: colStyle]],
-                        [v: row.duration, f: Time.secToStr(row.duration), p:[style: colStyle]],
-                        [v: row.timestamp, p:[style: colStyle]]
+                    data << [c: [[v: row.level, p: leftAlign],
+                        [v: row.difficulty, p: centerAlign],
+                        [v: row.length, p: centerAlign],
+                        [v: row.result, p: centerAlign],
+                        [v: row.wave, p: centerAlign],
+                        [v: row.duration, f: Time.secToStr(row.duration), p: centerAlign],
+                        [v: row.timestamp, p: centerAlign]
                     ]]
                 }
                 break
@@ -278,7 +278,7 @@ public class DataJson extends Resource {
                         fVal= Time.secToStr(row.value)
                     }
                     data << [c: [[v: row.stat], 
-                        [v: row.value, f: fVal, p:[style: colStyle]],
+                        [v: row.value, f: fVal, p: centerAlign],
                     ]]
                 }
                 break
