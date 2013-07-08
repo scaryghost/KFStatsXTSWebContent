@@ -41,7 +41,8 @@ public class DataJson extends Resource {
                         [label: it[0], type: it[1]]
                     }
                     reader.getDifficulties().each {row ->
-                        def avgWave= row.wave_sum / (row.wins + row.losses)
+                        def avgWave= WebCommon.computeAvgWave(row)
+
                         data << [c: [[v: row.name, f:"<a href='wavedata.html?difficulty=${row.name}&length=${row.length}'>${row.name}</a>"], 
                             [v: row.length, p: centerAlign],
                             [v: row.wins, p: centerAlign],
@@ -123,7 +124,7 @@ public class DataJson extends Resource {
                         [label: it[0], type: it[1]]
                     }
                     reader.getLevelData(queries.level).each {row ->
-                        def avgWave= row.wave_sum / (row.wins + row.losses)
+                        def avgWave= WebCommon.computeAvgWave(row)
                         data << [c: [[v: row.difficulty, f:"<a href='wavedata.html?difficulty=${row.difficulty}&length=${row.length}&level=${queries.level}' style='color:#0073BF'>${row.difficulty}</a>"], 
                                 [v:row.length], [v: row.wins], [v: row.losses], [v:avgWave, f: String.format("%.2f",avgWave)], 
                                 [v:row.time, f: Time.secToStr(row.time)]
@@ -164,7 +165,7 @@ public class DataJson extends Resource {
                         [label: it[0], type: it[1]]
                     }
                     reader.getDifficultyData(queries.difficulty, queries.length).each {row ->
-                        def avgWave= row.wave_sum / (row.wins + row.losses)
+                        def avgWave= WebCommon.computeAvgWave(row)
 
                         data << [c: [[v: row.level, f:"<a href='wavedata.html?difficulty=${queries.difficulty}&length=${queries.length}&level=${row.level}'>${row.level}</a>"], 
                             [v: row.wins, p: centerAlign],

@@ -1,8 +1,19 @@
 import com.github.etsai.kfsxtrackingserver.DataReader.Order
+import com.github.etsai.kfsxtrackingserver.DataReader.Record
 import com.github.etsai.utils.Time
 import groovy.xml.MarkupBuilder
 
 public class WebCommon {
+    public static double computeAvgWave(Record record) {
+        def avg
+        
+        try {
+            avg= record.wave_sum/(record.wins + record.losses)
+        } catch (ArithmeticException ex) {
+            avg= 0.0
+        }
+        return avg
+    }
     public static def aggregateCombineMatchHistory(def matchHistory, def orderByLevel) {
         def aggregateData= [:]
 

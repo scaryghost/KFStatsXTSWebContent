@@ -119,22 +119,22 @@ $chartCalls
                 }
                 builder.'stats'(category:"difficulties") {
                     def accum= [wins: 0, losses: 0, time: 0]
-                    reader.getDifficulties().each {diffiulty ->
-                        def attr= [name: diffiulty.name, length: diffiulty.length, wins: diffiulty.wins, losses: diffiulty.losses, time: diffiulty.time]
+                    reader.getDifficulties().each {difficulty ->
+                        def attr= [name: difficulty.name, length: difficulty.length, wins: difficulty.wins, losses: difficulty.losses, time: difficulty.time]
                         accum.keySet().each {key ->
                             accum[key]+= attr[key]
                         }
     
-                        attr["avg-wave"]= String.format("%.2f", diffiulty.wave_sum / (diffiulty.wins + diffiulty.losses))
+                        attr["avg-wave"]= String.format("%.2f", WebCommon.computeAvgWave(difficulty))
                         'entry'(attr) {
-                            reader.getDifficultyData(diffiulty.name, diffiulty.length).each {data ->
+                            reader.getDifficultyData(difficulty.name, difficulty.length).each {data ->
                                 def dataAttr= [name: data.level, wins: data.wins, losses: data.losses, time: data.time]
-                                dataAttr["avg-wave"]= String.format("%.2f", data.wave_sum / (data.wins + data.losses))
+                                dataAttr["avg-wave"]= String.format("%.2f", WebCommon.computeAvgWave(data))
                                 builder.'difficulty'(dataAttr) {
                                     'formatted-time'(Time.secToStr(data.time))
                                 }
                             }
-                            'formatted-time'(Time.secToStr(diffiulty.time))
+                            'formatted-time'(Time.secToStr(difficulty.time))
                         }
                     }
                 
@@ -155,7 +155,7 @@ $chartCalls
                             'formatted-time'(Time.secToStr(accum.time))
                             reader.getLevelData(level.name).each {data ->
                                 def dataAttr= [name: data.difficulty, length: data.length, wins: data.wins, losses: data.losses, time: data.time]
-                                dataAttr["avg-wave"]= String.format("%.2f", data.wave_sum / (data.wins + data.losses))
+                                dataAttr["avg-wave"]= String.format("%.2f", WebCommon.computeAvgWave(data))
                                 builder.'difficulty'(dataAttr) {
                                     'formatted-time'(Time.secToStr(data.time))
                                 }

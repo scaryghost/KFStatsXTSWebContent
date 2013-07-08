@@ -173,7 +173,7 @@ public class WaveDataHtml extends WebPageBase {
                     'stats'(category: 'levels') {
                         reader.getDifficultyData(queries.difficulty, queries.length).each {data ->
                             def dataAttr= [name: data.level, wins: data.wins, losses: data.losses, time:data.time, 
-                                "avg-wave": String.format("%.2f", data.wave_sum / (data.wins + data.losses))]
+                                "avg-wave": String.format("%.2f", WebCommon.computeAvgWave(data))]
                             'entry'(dataAttr) {
                                 'formatted-time'(Time.secToStr(data.time))
                             }
