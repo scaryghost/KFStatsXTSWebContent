@@ -1,25 +1,31 @@
 import groovy.xml.MarkupBuilder
 
-def damages= [25000:1 , 100000:2, 500000:3, 1500000:4, 3500000:5, 5500000:6] 
-def perks= [medic: [damagehealed: [200:1, 750:2, 4000:3, 12000:4, 25000:5, 100000:6]], 
-    sharp: [headshotkills: [30:1, 100:2, 700:3, 2500:4, 5500:5, 8500:6]], 
-    support: [shotgundamage: damages, weldingpoints: [2000:1, 7000:2, 35000:3, 120000:4, 250000:5, 370000:6]], 
-    commando: [bullpupdamage: damages, stalkerkills: [30:1, 100:2, 350:3, 1200:4, 2400:5, 3600:6]], 
+def damages= [25000, 100000, 500000, 1500000, 3500000, 5500000, 11000000]
+def perks= [medic: [damagehealed: [200, 750, 4000, 12000, 25000, 100000, 200000]], 
+    sharp: [headshotkills: [30, 100, 700, 2500, 5500, 8500, 17000]], 
+    support: [shotgundamage: damages, weldingpoints: [2000, 7000, 35000, 120000, 250000, 370000, 740000]], 
+    commando: [bullpupdamage: damages, stalkerkills: [30, 100, 350, 1200, 2400, 3600, 7200]], 
     berserker: [meleedamage: damages], firebug: [flamethrowerdamage: damages], demo: [explosivesdamage: damages]]
 
+def playerProgress= [:]
+def perkLevels= [:]
+/*
 def url= new URL("http://steamcommunity.com/profiles/${args[0]}/statsfeed/1250")
 def content= url.getContent().readLines().join("\n")
-def xmlRoot= new XmlSlurper().parseText(content)
+*/
+def xmlRoot= new XmlSlurper().parse(new File(args[0]))
 
 def getLevel= {requirements ->
     def totalLevel= 6
     requirements.each {apiName, progress ->
         def item= xmlRoot.stats.item.find { it.APIName.text() == apiName }
-        def maxLevel= 0;
-        progress.each {amount, level ->
+        def maxLevel= 0, level= 1
+        progress.each {amount ->
+            playerProgress[apiName]= item.value.text()
             if (amount <= item.value.text().toInteger()) {
                 maxLevel= level
             }
+            level++
         }
         if (maxLevel < totalLevel) {
             totalLevel= maxLevel
@@ -33,14 +39,9 @@ def calcProgress= {level, requirements ->
 
     requirements.each {apiName, progress ->
         def item= xmlRoot.stats.item.find { it.APIName.text() == apiName }
-        def maxPercent= 0
-        progress.keySet().each {amount ->
-            def percent= [item.value.text().toFloat() / amount, 1.0].min()
-            if (percent > maxPercent) {
-                maxPercent= percent
-            }
-        }
-        totalPercent+= maxPercent / requirements.keySet().size()
+        def percent= level > 0 ? [(item.value.text().toFloat() - progress[level - 1]) / (progress[level] - progress[level - 1]), 1.0].min() :
+            [item.value.text().toFloat() / progress[level], 1.0].min()
+        totalPercent+= percent / requirements.keySet().size()
     }
     return totalPercent
 }
@@ -61,7 +62,8 @@ htmlBuilder.html() {
         script(type:'text/javascript') {
             def i= -1
             def js= perks.collect {perk, requirements ->
-                def percent= (calcProgress(getLevel(requirements), requirements) * 100).toInteger()
+                perkLevels[perk]= getLevel(requirements)
+                def percent= (calcProgress(perkLevels[perk], requirements) * 100).toInteger()
                 i++
                 """\$("#perk_${i}").animate( { width: "${percent}%" }, 500);\n"""
             }.join("")
@@ -70,10 +72,18 @@ htmlBuilder.html() {
     }
     body() {
         def i= 0
-        perks.keySet().each {perk ->
-            div(class: "progress-bar") {
-                div(class: "status", id:"perk_${i}", "")
-                i++
+        perks.each {perk, requirements ->
+            p() {
+                mkp.yieldUnescaped(perk.capitalize())
+                div(class: "progress-bar") {
+                    div(class: "status", id:"perk_${i}", "")
+                    i++
+                }
+                mkp.yieldUnescaped("Level ${perkLevels[perk]}<br>")
+                requirements.each {name, progress ->
+                    def j= progress[[perkLevels[perk], 5].min()]
+                    mkp.yieldUnescaped("${playerProgress[name]}/$j<br>")
+                }
             }
         }
     }
