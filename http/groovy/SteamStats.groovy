@@ -1,10 +1,10 @@
 import groovy.xml.MarkupBuilder
 
-def damages= [25000, 100000, 500000, 1500000, 3500000, 5500000, 11000000]
-def perks= [medic: [damagehealed: [200, 750, 4000, 12000, 25000, 100000, 200000]], 
-    sharp: [headshotkills: [30, 100, 700, 2500, 5500, 8500, 17000]], 
-    support: [shotgundamage: damages, weldingpoints: [2000, 7000, 35000, 120000, 250000, 370000, 740000]], 
-    commando: [bullpupdamage: damages, stalkerkills: [30, 100, 350, 1200, 2400, 3600, 7200]], 
+def damages= [25000, 100000, 500000, 1500000, 3500000, 5500000]
+def perks= [medic: [damagehealed: [200, 750, 4000, 12000, 25000, 100000]], 
+    sharp: [headshotkills: [30, 100, 700, 2500, 5500, 8500]], 
+    support: [shotgundamage: damages, weldingpoints: [2000, 7000, 35000, 120000, 250000, 370000]], 
+    commando: [bullpupdamage: damages, stalkerkills: [30, 100, 350, 1200, 2400, 3600]], 
     berserker: [meleedamage: damages], firebug: [flamethrowerdamage: damages], demo: [explosivesdamage: damages]]
 def niceNames= [damagehealed: "Healing", headshotkills: "Head Shots", shotgundamage: "Shotgun Damage", weldingpoints: "Welding", 
         bullpupdamage: "Assault Rifle Damage", stalkerkills: "Stalkers Killed", meleedamage: "Melee Damage", flamethrowerdamage: "Fire Damage", 
@@ -17,32 +17,39 @@ def content= url.getContent().readLines().join("\n")
 */
 def xmlRoot= new XmlSlurper().parse(new File(args[0]))
 
+def getProgress= {level, progress ->
+    def amount
+    if (level >= progress.size()) {
+        amount= progress.last() * (level - progress.size() + 2)
+    } else {
+        amount= progress[level]
+    }
+    amount
+}
 def getLevel= {requirements ->
-    def totalLevel= 6
+    def totalLevels= []
     requirements.each {apiName, progress ->
         def item= xmlRoot.stats.item.find { it.APIName.text() == apiName }
-        def maxLevel= 0, level= 1
-        progress.each {amount ->
-            playerProgress[apiName]= item.value.text()
-            if (amount <= item.value.text().toInteger()) {
-                maxLevel= level
-            }
+        def level= 0, amount
+        playerProgress[apiName]= item.value.text().toInteger()
+
+        amount= getProgress(level, progress)
+        level++
+        while(amount <= playerProgress[apiName]) {
+            amount= getProgress(level, progress)
             level++
         }
-        if (maxLevel < totalLevel) {
-            totalLevel= maxLevel
-        }
+        totalLevels << level - 1
     }
-    return totalLevel
+    return totalLevels.min()
 }
 
 def calcProgress= {level, requirements ->
     def totalPercent= 0
 
     requirements.each {apiName, progress ->
-        def item= xmlRoot.stats.item.find { it.APIName.text() == apiName }
-        def percent= level > 0 ? [(item.value.text().toFloat() - progress[level - 1]) / (progress[level] - progress[level - 1]), 1.0].min() :
-            [item.value.text().toFloat() / progress[level], 1.0].min()
+        def percent= level > 0 ? [((playerProgress[apiName] - getProgress(level - 1, progress)) * 100) / (getProgress(level, progress) - getProgress(level - 1, progress)), 100].min() :
+            [(playerProgress[apiName] * 100) / getProgress(level, progress), 100].min()
         totalPercent+= percent / requirements.keySet().size()
     }
     return totalPercent
@@ -65,7 +72,7 @@ htmlBuilder.html() {
             def i= -1
             def js= perks.collect {perk, requirements ->
                 perkLevels[perk]= getLevel(requirements)
-                def percent= (calcProgress(perkLevels[perk], requirements) * 100).toInteger()
+                def percent= calcProgress(perkLevels[perk], requirements)
                 i++
                 """\$("#perk_${i}").animate( { width: "${percent}%" }, 500);\n"""
             }.join("")
@@ -93,7 +100,7 @@ htmlBuilder.html() {
                 tr() {
                     td() {
                         requirements.each {name, progress ->
-                            def j= progress[[perkLevels[perk], 5].min()]
+                            def j= perkLevels[perk] >= 6 ? progress.last() : progress[perkLevels[perk]]
                             mkp.yieldUnescaped("${playerProgress[name]}/$j ${niceNames[name]}<br>")
                         }
                     }
