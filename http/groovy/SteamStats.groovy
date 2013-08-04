@@ -28,16 +28,15 @@ def getLevel= {requirements ->
     return totalLevel
 }
 
-def calcProgress= {level, perk ->
-    def requirements= perks[perk]
+def calcProgress= {level, requirements ->
     def totalPercent= 0
 
     requirements.each {apiName, progress ->
         def item= xmlRoot.stats.item.find { it.APIName.text() == apiName }
         def maxPercent= 0
         progress.keySet().each {amount ->
-            def percent= item.value.text().toFloat() / amount
-            if (percent <= 1.0 && percent > maxPercent) {
+            def percent= [item.value.text().toFloat() / amount, 1.0].min()
+            if (percent > maxPercent) {
                 maxPercent= percent
             }
         }
@@ -50,29 +49,30 @@ def writer= new StringWriter()
 def htmlBuilder= new MarkupBuilder(writer)
 
 def css= """
-        #progress-bar {border:1px solid #bebebe; background:#ffffff; width:300px; height:14px; -moz-border-radius:10px; -webkit-border-radius:10px; -khtml-border-radius:10px; border-radius:10px;}
-        #status {background:#0066cc; width:50%; height:14px; -moz-border-radius:10px; -webkit-border-radius:10px; -khtml-border-radius:10px; border-radius:10px;}
+        .progress-bar {border:1px solid #bebebe; background:#ffffff; width:300px; height:14px; -moz-border-radius:10px; -webkit-border-radius:10px; -khtml-border-radius:10px; border-radius:10px;}
+        .status {background:#0066cc; width:0%; height:14px; -moz-border-radius:10px; -webkit-border-radius:10px; -khtml-border-radius:10px; border-radius:10px;}
     """
 
 htmlBuilder.html() {
     head() {
         meta('http-equiv':'content-type', content:'text/html; charset=utf-8')
         style(css)
-        script(type:'text/javascript', src:"//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js", '')
+        script(type:'text/javascript', src:"http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js", '')
         script(type:'text/javascript') {
-            def i= 0
-            perks.each {perk, requirements ->
-                def percent= calcProgress(getLevel(requirements), perk).toInteger()
-                mkp.yieldUnescaped("""\$("#status_${i}").animate( { width: "${percent}"% }, 500);""")
+            def i= -1
+            def js= perks.collect {perk, requirements ->
+                def percent= (calcProgress(getLevel(requirements), requirements) * 100).toInteger()
                 i++
-            }
+                """\$("#perk_${i}").animate( { width: "${percent}%" }, 500);\n"""
+            }.join("")
+            mkp.yieldUnescaped("\$(function() { $js });")
         }
     }
     body() {
-        div(id: "progress-bar") {
-            def i= 0
-            perks.keySet().each {perk ->
-                div(id: "status_${i}", "")
+        def i= 0
+        perks.keySet().each {perk ->
+            div(class: "progress-bar") {
+                div(class: "status", id:"perk_${i}", "")
                 i++
             }
         }
