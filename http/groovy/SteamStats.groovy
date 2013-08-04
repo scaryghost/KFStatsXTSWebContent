@@ -6,7 +6,9 @@ def perks= [medic: [damagehealed: [200, 750, 4000, 12000, 25000, 100000, 200000]
     support: [shotgundamage: damages, weldingpoints: [2000, 7000, 35000, 120000, 250000, 370000, 740000]], 
     commando: [bullpupdamage: damages, stalkerkills: [30, 100, 350, 1200, 2400, 3600, 7200]], 
     berserker: [meleedamage: damages], firebug: [flamethrowerdamage: damages], demo: [explosivesdamage: damages]]
-
+def niceNames= [damagehealed: "Healing", headshotkills: "Head Shots", shotgundamage: "Shotgun Damage", weldingpoints: "Welding", 
+        bullpupdamage: "Assault Rifle Damage", stalkerkills: "Stalkers Killed", meleedamage: "Melee Damage", flamethrowerdamage: "Fire Damage", 
+        explosivesdamage: "Explosives Damage"]
 def playerProgress= [:]
 def perkLevels= [:]
 /*
@@ -71,22 +73,34 @@ htmlBuilder.html() {
         }
     }
     body() {
-        def i= 0
-        perks.each {perk, requirements ->
-            p() {
-                mkp.yieldUnescaped(perk.capitalize())
-                div(class: "progress-bar") {
-                    div(class: "status", id:"perk_${i}", "")
-                    i++
+        table(border: "1") {
+            def i= 0
+            perks.each {perk, requirements ->
+                tr() {
+                    td(rowspan: "2") {
+                        p() {
+                            mkp.yieldUnescaped(perk.capitalize())
+                            div(class: "progress-bar") {
+                                div(class: "status", id:"perk_${i}", "")
+                                i++
+                            }
+                        }
+                    }
+                    td() {
+                        mkp.yieldUnescaped("Level ${perkLevels[perk]}<br>")
+                    }
                 }
-                mkp.yieldUnescaped("Level ${perkLevels[perk]}<br>")
-                requirements.each {name, progress ->
-                    def j= progress[[perkLevels[perk], 5].min()]
-                    mkp.yieldUnescaped("${playerProgress[name]}/$j<br>")
+                tr() {
+                    td() {
+                        requirements.each {name, progress ->
+                            def j= progress[[perkLevels[perk], 5].min()]
+                            mkp.yieldUnescaped("${playerProgress[name]}/$j ${niceNames[name]}<br>")
+                        }
+                    }
                 }
             }
         }
     }
 }
     
-println writer
+print writer
