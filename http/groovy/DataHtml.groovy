@@ -102,6 +102,9 @@ public class DataHtml extends Resource {
                                         li(class: "nav-list") {
                                             a(target: "_blank", href: "matchhistory.html?steamid64=" + steamid64, "Match History")
                                         }
+                                        li(class: "nav-list") {
+                                            a(href: 'javascript:showPerkLevel(' + steamid64 + ')', "Perk Progression")
+                                        }
                                     }
                                 }
                             }

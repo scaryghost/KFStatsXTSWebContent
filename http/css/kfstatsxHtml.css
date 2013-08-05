@@ -90,6 +90,13 @@ a.footer-link {
     margin-right: auto;
 }
 
+.perk-table {
+    width: 1240px;
+    border-collapse: collapse;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 .nav-list {
     padding-left: 5px;
     display: inline;
@@ -124,3 +131,25 @@ th {
     width: 200px;
     z-index: 1000;
 }
+
+.progress-bar {
+    border:1px solid #bebebe;
+    background:#ffffff;
+    width:600px;
+    height:14px;
+    -moz-border-radius:10px;
+    -webkit-border-radius:10px;
+    -khtml-border-radius:10px;
+    border-radius:10px;
+}
+
+.status {
+    background:#0066cc;
+    width:0%;
+    height:14px;
+    -moz-border-radius:10px;
+    -webkit-border-radius:10px;
+    -khtml-border-radius:10px;
+    border-radius:10px;
+}
+
