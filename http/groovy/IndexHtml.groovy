@@ -63,7 +63,7 @@ public class IndexHtml extends WebPageBase {
             }
         }
     }
-    protected void generateDialogJS() {
+    protected String generateDialogJS() {
         """
         \$(function() {
             \$( "#dialog" ).dialog({
@@ -105,7 +105,7 @@ public class IndexHtml extends WebPageBase {
                 chartCalls+= "            drawFilteredChart(${param[0]}, '${param[1].capitalize()}', '${param[2]}', '${chartType}');\n"
             }
         }
-        return """ ${generateDialogJs()}
+        return """ ${generateDialogJS()}
             ${WebCommon.filterChartJs}
             ${WebCommon.replaceHtml}
             ${WebCommon.chartJs}
