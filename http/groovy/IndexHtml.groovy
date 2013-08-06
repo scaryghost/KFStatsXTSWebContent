@@ -65,15 +65,6 @@ public class IndexHtml extends WebPageBase {
     }
     protected String generateDialogJS() {
         """
-        \$(function() {
-            \$( "#dialog" ).dialog({
-                autoOpen: false,
-                position: {my: "left+15%", at: "left top+15%"},
-                modal: true,
-                width: document.getElementById('levels_div').offsetWidth * 0.985
-            });
-            \$( "#menu" ).menu();
-        });
         function open(opts) {
             \$( "#dialog" ).dialog( "option", "title", ("title" in opts) ? opts["title"] : opts["level"]);
             \$( "#dialog" ).dialog( "open" );
@@ -105,7 +96,17 @@ public class IndexHtml extends WebPageBase {
                 chartCalls+= "            drawFilteredChart(${param[0]}, '${param[1].capitalize()}', '${param[2]}', '${chartType}');\n"
             }
         }
-        return """ ${generateDialogJS()}
+        return """ 
+        \$(function() {
+            \$( "#dialog" ).dialog({
+                autoOpen: false,
+                position: {my: "left+15%", at: "left top+15%"},
+                modal: true,
+                width: document.getElementById('levels_div').offsetWidth * 0.985
+            });
+            \$( "#menu" ).menu();
+        });
+            ${generateDialogJS()}
             ${WebCommon.filterChartJs}
             ${WebCommon.replaceHtml}
             ${WebCommon.chartJs}

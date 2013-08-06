@@ -61,16 +61,6 @@ public class ProfileHtml extends IndexHtml {
         }.join("")
 
         return """
-        \$(function() {
-            \$( "#dialog" ).dialog({
-                autoOpen: false,
-                position: {my: "left+15%", at: "left top+15%"},
-                modal: true,
-                width: document.getElementById('levels_div').offsetWidth * 0.985
-            });
-            \$( "#menu" ).menu();
-        });
-            
         function showPerkLevel(steamID64) {
             \$("#dialog").dialog("open");
 ${js}
