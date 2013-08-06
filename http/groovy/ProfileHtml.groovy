@@ -1,32 +1,17 @@
 import com.github.etsai.utils.Time
 
 public class ProfileHtml extends IndexHtml {
-    private def damages= [25000, 100000, 500000, 1500000, 3500000, 5500000]
-    private def perks= [medic: [damagehealed: [200, 750, 4000, 12000, 25000, 100000]], 
+    private static def damages= [25000, 100000, 500000, 1500000, 3500000, 5500000]
+    private static def perks= [medic: [damagehealed: [200, 750, 4000, 12000, 25000, 100000]], 
         sharp: [headshotkills: [30, 100, 700, 2500, 5500, 8500]], 
         support: [shotgundamage: damages, weldingpoints: [2000, 7000, 35000, 120000, 250000, 370000]], 
         commando: [bullpupdamage: damages, stalkerkills: [30, 100, 350, 1200, 2400, 3600]], 
         berserker: [meleedamage: damages], firebug: [flamethrowerdamage: damages], demo: [explosivesdamage: damages]]
-    private def niceNames= [damagehealed: "Healing", headshotkills: "Head Shots", shotgundamage: "Shotgun Damage", weldingpoints: "Welding", 
+    private static def niceNames= [damagehealed: "Healing", headshotkills: "Head Shots", shotgundamage: "Shotgun Damage", weldingpoints: "Welding", 
         bullpupdamage: "Assault Rifle Damage", stalkerkills: "Stalkers Killed", meleedamage: "Melee Damage", flamethrowerdamage: "Fire Damage", 
         explosivesdamage: "Explosives Damage"]
-    private def playerProgress= [:]
-    private def perkLevels= [:]
-    private def xmlRoot
+    private def playerProgress= [:], perkLevels= [:], xmlRoot
 
-    private static def perkJS= """
-            \$(function() {
-                \$( "#dialog_perks" ).dialog({
-                    autoOpen: false,
-                    position: {my: "left+15%", at: "left top+15%"},
-                    modal: true,
-                    width: document.getElementById('levels_div').offsetWidth * 0.985
-                });
-            });
-            
-            function showPerkLevel(steamID64) {
-                \$("#dialog_perks").dialog("open");
-"""
     public ProfileHtml() {
         super()
         htmlDiv << "profile"
@@ -87,7 +72,7 @@ private def calcProgress(level, requirements) {
 
 
 
-    protected void fillContentBoxes(def builder) {
+    protected void addDialogBox(def builder) {
         builder.div(id: 'dialog_perks', title:'Perk Progress') {
             table(class: "perk-table") {
                 def i= 0
@@ -117,22 +102,32 @@ private def calcProgress(level, requirements) {
                 }
             }
         }
-        super.fillContentBoxes(builder)
     }
 
-    protected void fillVisualizationJS(def builder) {
-        super.fillVisualizationJS(builder)
-            def i= -1
-            def js= perks.collect {perk, requirements ->
-                perkLevels[perk]= getLevel(requirements)
-                def percent= calcProgress(perkLevels[perk], requirements)
-                i++
-                """\$("#perk_${i}").animate( { width: "${percent}%" }, 500);\n"""
-            }.join("")
+    protected void generateDialogJS() {
+        def i= -1
+        def js= perks.collect {perk, requirements ->
+            perkLevels[perk]= getLevel(requirements)
+            def percent= calcProgress(perkLevels[perk], requirements)
+            i++
+            """\$("#perk_${i}").animate( { width: "${percent}%" }, 500);\n"""
+        }.join("")
+
+        return """
+            \$(function() {
+                \$( "#dialog_perks" ).dialog({
+                    autoOpen: false,
+                    position: {my: "left+15%", at: "left top+15%"},
+                    modal: true,
+                    width: document.getElementById('levels_div').offsetWidth * 0.985
+                });
+            });
             
-        builder.script(type: 'text/javascript') {
-            mkp.yieldUnescaped(perkJS + js + "}")
-        }
+            function showPerkLevel(steamID64) {
+                \$("#dialog_perks").dialog("open");
+                ${js}
+            }
+            """
     }
 
     protected void buildXml(def builder) {

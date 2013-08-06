@@ -46,8 +46,12 @@ public class IndexHtml extends WebPageBase {
             mkp.yieldUnescaped(generateCommonJs(stndChartsParams))
         }
     }
-    protected void fillContentBoxes(def builder) {
+
+    protected void addDialogBox(def builder) {
         builder.div(id: 'dialog', title:'Levels', '')
+    }
+    protected void fillContentBoxes(def builder) {
+        addDialogBox(builder)
         navigation.each {item ->
             if (chartTypes[item] == null) {
                 builder.div(id: item + "_div", class:'contentbox', '') 
@@ -59,20 +63,8 @@ public class IndexHtml extends WebPageBase {
             }
         }
     }
-
-    protected String generateCommonJs(def parameters) {
-        def chartCalls= ""
-        parameters.each {param ->
-            def chartType= param[3] == null ? 'Table' : param[3]
-            if (param[1] == null) {
-                chartCalls+= "            replaceHtml(\"${param[0]}\", '${param[2]}');\n"
-            } else if (chartTypes[param[1]] == null) {
-                chartCalls+= "            drawChart(${param[0]}, '${param[1]}', '${param[2]}', '${chartType}');\n"
-            } else {
-                chartCalls+= "            drawFilteredChart(${param[0]}, '${param[1].capitalize()}', '${param[2]}', '${chartType}');\n"
-            }
-        }
-        return """ 
+    protected void generateDialogJS() {
+        """
         \$(function() {
             \$( "#dialog" ).dialog({
                 autoOpen: false,
@@ -98,6 +90,22 @@ public class IndexHtml extends WebPageBase {
             var data= \$.ajax({url: "data.json?" + query, dataType:"json", async: false}).responseText;
             drawChart(data, 'Difficulties', 'dialog', 'Table');
         }
+        """
+    }
+
+    protected String generateCommonJs(def parameters) {
+        def chartCalls= ""
+        parameters.each {param ->
+            def chartType= param[3] == null ? 'Table' : param[3]
+            if (param[1] == null) {
+                chartCalls+= "            replaceHtml(\"${param[0]}\", '${param[2]}');\n"
+            } else if (chartTypes[param[1]] == null) {
+                chartCalls+= "            drawChart(${param[0]}, '${param[1]}', '${param[2]}', '${chartType}');\n"
+            } else {
+                chartCalls+= "            drawFilteredChart(${param[0]}, '${param[1].capitalize()}', '${param[2]}', '${chartType}');\n"
+            }
+        }
+        return """ ${generateDialogJs()}
             ${WebCommon.filterChartJs}
             ${WebCommon.replaceHtml}
             ${WebCommon.chartJs}
