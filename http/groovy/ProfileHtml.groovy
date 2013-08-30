@@ -22,28 +22,32 @@ public class ProfileHtml extends IndexHtml {
 
     protected void addDialogBox(def builder) {
         builder.div(id: 'dialog', title:'Perk Progression') {
-            table(class: "perk-table") {
+            table(class: "perk-table", cellspacing:"5px") {
                 def i= 0
                 veterancy.getPerks().each {perk, requirements ->
                     tr() {
-                        td(rowspan: "2") {
-                            p() {
+                        td() {
                                 mkp.yieldUnescaped(perk.capitalize())
-                                div(class: "progress-bar") {
-                                    div(class: "status", id:"perk_${i}", "")
-                                    i++
-                                }
+                        }
+                        td() {
+                            div(class:"level-cell") {
+                                mkp.yieldUnescaped("Level ${veterancy.getLevel(perk)}<br>")
                             }
                         }
-                        td() {
-                            mkp.yieldUnescaped("Level ${veterancy.getLevel(perk)}<br>")
-                        }
-                    }
-                    tr() {
-                        td() {
+                        td(rowspan:"2") {
+                            div(style:"text-align: justify") {
                             requirements.each {name, progress ->
                                 def j= veterancy.getLevel(perk) >= 6 ? progress.last() : progress[veterancy.getLevel(perk)]
                                 mkp.yieldUnescaped("${veterancy.getPlayerProgress(name)}/$j ${Veterancy.niceNames[name]}<br>")
+                            }
+                            }
+                        }
+                    }
+                    tr(class:"progress-row") {
+                        td(colspan: "2") {
+                            div(class: "progress-bar") {
+                                div(class: "status", id:"perk_${i}", "")
+                                i++
                             }
                         }
                     }

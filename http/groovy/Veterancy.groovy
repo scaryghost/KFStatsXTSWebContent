@@ -1,8 +1,8 @@
 public class Veterancy {
     private def damages= [25000, 100000, 500000, 1500000, 3500000, 5500000]
     private def requirements= [medic: [damagehealed: [200, 750, 4000, 12000, 25000, 100000]], 
-        sharp: [headshotkills: [30, 100, 700, 2500, 5500, 8500]], 
-        support: [shotgundamage: damages, weldingpoints: [2000, 7000, 35000, 120000, 250000, 370000]], 
+        sharpshooter: [headshotkills: [30, 100, 700, 2500, 5500, 8500]], 
+        "support Specialist": [shotgundamage: damages, weldingpoints: [2000, 7000, 35000, 120000, 250000, 370000]], 
         commando: [bullpupdamage: damages, stalkerkills: [30, 100, 350, 1200, 2400, 3600]], 
         berserker: [meleedamage: damages], firebug: [flamethrowerdamage: damages], demo: [explosivesdamage: damages]]
     public static def niceNames= [damagehealed: "Healing", headshotkills: "Head Shots", shotgundamage: "Shotgun Damage", weldingpoints: "Welding", 

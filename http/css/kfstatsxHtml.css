@@ -92,9 +92,19 @@ a.footer-link {
 
 .perk-table {
     width: 1240px;
-    border-collapse: collapse;
     margin-left: auto;
     margin-right: auto;
+}
+
+tr.progress-row > td {
+  padding-bottom: 1em;
+}
+
+.level-cell {
+    vertical-align: sub;
+    text-align: center;
+    position: relative;
+    left: -100px;
 }
 
 .nav-list {
