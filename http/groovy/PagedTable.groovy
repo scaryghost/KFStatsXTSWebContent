@@ -4,6 +4,8 @@ import groovy.xml.MarkupBuilder
 
 public abstract class PagedTable extends WebPageBase {
     protected final def category, formUrl
+    protected def stylesheets= ['http/css/jquery.dataTables.css']
+    protected def jsFiles= ['//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js', 'http/js/jquery.dataTables.min.js']
 
     protected PagedTable(def category, def formUrl) {
         super()
@@ -12,18 +14,23 @@ public abstract class PagedTable extends WebPageBase {
     }
 
     protected void fillVisualizationJS(def builder) {
-        def ajaxQueries= ["table=$category"]
-
-        queries.each {key, value ->
-            ajaxQueries << "$key=$value"
-        }
         builder.script(type: 'text/javascript') {
-            mkp.yieldUnescaped(pagedTable(ajaxQueries))
+            mkp.yieldUnescaped("""
+        var table;
+        \$(document).ready(function() {
+            table= \$('#$category').dataTable({${dataTableOptions()}});
+        } );
+
+        function updatePageSize(pageSize) {
+            table.fnSettings()._iDisplayLength= pageSize;
+            table.fnDraw();
+        }
+  """)
         }
     }
 
     protected void fillContentBoxes(def builder) {
-        builder.div(id:category + '_div_outer', class:'contentbox') {
+        builder.div(id:"${category}_div_outer", class:'contentbox') {
             form(action:'', 'Number of rows:') {
                 select(onchange:'updatePageSize(parseInt(this.value, 10))') {
                     option(selected:"selected", value:'25', '25')
@@ -37,75 +44,29 @@ public abstract class PagedTable extends WebPageBase {
                 input(type:'text', name:'steamid64')
                 input(type:'submit', value:'Search Player')
             }
-            div(id: category + '_div', '')
+            table(id:"$category", '')
         }
     }
 
-    protected String pagedTable(def ajaxQueries) {
+    protected String dataTableOptions() {
         """
-        var page= 0, pageSize= 25, group="none", order= "ASC";
-        var data, chart;
-
-        function buildQuery() {
-            return ["page=" + page, "rows=" + pageSize, "group=" + group, "order=" + order].join('&');
-        }
-        function buildDataTable() {
-            return new google.visualization.DataTable(\$.ajax({url: "data.json?${ajaxQueries.join('&')}&" + buildQuery(), dataType:"json", async: false}).responseText);
-        }
-        google.setOnLoadCallback(drawVisualization);
-        function drawVisualization() {
-            data= buildDataTable();
-            chart= new google.visualization.ChartWrapper({'chartType': 'Table', 'containerId': '${category}_div', 
-                'options': {
-                    'page': 'event',
-                    'sort': 'event',
-                    'pageSize': pageSize,
-                    'pagingButtonsConfiguration': 'both',
-                    'showRowNumber': true,
-                    'allowHtml': true,
-                    'height': document.getElementById('${category}_div_outer').offsetHeight * 0.925,
-                    'width': document.getElementById('${category}_div_outer').offsetWidth * 0.985
+                "bPaginate": true,
+                "bProcessing": true,
+                "bLengthChange": false,
+                "bFilter": false,
+                "bSort": true,
+                "bInfo": true,
+                "bAutoWidth": true,
+                "bServerSide": true,
+                "iDisplayLength": 25,
+                "sAjaxSource": 'data.json',
+                "sPaginatationType": 'full_numbers',
+                "fnServerData": function (sSource, aoData, fnCallback) {
+                    aoData.push({"name": "table", "value": "$category"});
+                    \$.getJSON(sSource, aoData, function(json) {
+                        fnCallback(json)
+                    })
                 }
-            });
-
-            google.visualization.events.addListener(chart, 'ready', onReady);
-            chart.setDataTable(data);
-            chart.draw();
-
-            function onReady() {
-                google.visualization.events.addListener(chart.getChart(), 'page', function(properties) {
-                    page+= parseInt(properties['page'], 10);
-                    if (page < 0) {
-                        page= 0;
-                    }
-
-                    data= buildDataTable();
-                    if (data.getNumberOfRows() == 0) {
-                        page--;
-                    } else {
-                        chart.setOption('firstRowNumber', pageSize * page + 1);
-                        chart.setDataTable(data);
-                        chart.draw();
-                    }
-                });
-                google.visualization.events.addListener(chart.getChart(), 'sort', function(properties) {
-                    order= properties["ascending"] ? "asc" : "desc";
-                    group= data.getColumnId(properties["column"]);
-                    data= buildDataTable();
-                    chart.setOption('sortColumn', properties["column"]);
-                    chart.setOption('sortAscending', properties["ascending"]);
-                    chart.setDataTable(data);
-                    chart.draw();
-                });
-            }
-        }
-        function updatePageSize(newSize) {
-            pageSize= newSize;
-            data= buildDataTable();
-            chart.setDataTable(data);
-            chart.setOption('pageSize', pageSize);
-            chart.draw();
-        }
-  """
+"""
     }
 }

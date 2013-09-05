@@ -29,4 +29,17 @@ public class RecordsHtml extends PagedTable {
             }
         }
     }
+
+    protected String dataTableOptions() {
+        """
+                "aoColumnDefs": [
+                    { "sTitle": "Name", "sName": "name", "aTargets": [ 0 ] },
+                    { "sTitle": "Wins", "sName": "wins", "aTargets": [ 1 ] },
+                    { "sTitle": "Losses", "sName": "losses", "aTargets": [ 2 ] },
+                    { "sTitle": "Disconnects", "sName": "disconnects", "aTargets": [ 3 ] },
+                    { "sTitle": "Time Connected", "sName": "time", "aTargets": [ 4 ] }
+                ],
+""" + super.dataTableOptions()
+    
+    }
 }

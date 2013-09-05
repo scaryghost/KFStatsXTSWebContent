@@ -203,20 +203,24 @@ public class DataJson extends Resource {
                 }
                 break
             case "records":
-                columns= [["name", "Name", "string"], ["wins", "Wins", "number"], ["losses", "Losses", "number"], ["disconnects", "Disconnects", "number"], 
-                ["time", "Time Connected", "numner"]].collect {
-                    [id: it[0], label: it[1], type: it[2]]
-                }
+                    queries.rows= queries.iDisplayLength
+                    queries.page= (queries.iDisplayStart.toInteger() / queries.rows.toInteger()).toString()
+                    queries.group= queries.sColumns.tokenize(",")[queries.iSortCol_0.toInteger()]
+                    queries.order= queries.sSortDir_0
+        
+                    WebCommon.partialQuery(reader, queries, true).each {row ->
+                        def steamInfo= reader.getSteamIDInfo(row.steamid64)
+                        data << ["<a href=profile.html?steamid64=${row.steamid64}>${steamInfo.name}</a>", row.wins.toString(), 
+                                row.losses.toString(), row.disconnects.toString(), Time.secToStr(row.time)]
+                    }
 
-                WebCommon.partialQuery(reader, queries, true).each {row -> 
-                    def steamInfo= reader.getSteamIDInfo(row.steamid64)
-                    data << [c: [[v: steamInfo.name, f: "<a href=profile.html?steamid64=${row.steamid64}>${steamInfo.name}</a>", p: leftAlign], 
-                        [v: row.wins, p: centerAlign],
-                        [v: row.losses, p: centerAlign],
-                        [v: row.disconnects, p: centerAlign],
-                        [v: row.time, f: Time.secToStr(row.time), p: centerAlign]]]
-                }
-                break
+                    def root= builder {
+                        sEcho(queries.sEcho.toInteger())
+                        iTotalRecords(reader.getNumRecords())
+                        iTotalDisplayRecords(reader.getNumRecords())
+                        aaData(data)
+                    }
+                    return builder
             case "matchhistory":
                 columns= [["Level", "string"], ["Difficulty", "string"], ["Length", "string"],
                         ["Result", "string"], ["Wave", "number"], ["Duration", "number"], ["Timestamp", "string"]].collect {
