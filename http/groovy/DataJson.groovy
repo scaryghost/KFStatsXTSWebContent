@@ -222,21 +222,22 @@ public class DataJson extends Resource {
                     }
                     return builder
             case "matchhistory":
-                columns= [["Level", "string"], ["Difficulty", "string"], ["Length", "string"],
-                        ["Result", "string"], ["Wave", "number"], ["Duration", "number"], ["Timestamp", "string"]].collect {
-                    [id: it[0], label: it[0], type: it[1]]
-                }
+                queries.rows= queries.iDisplayLength
+                queries.page= (queries.iDisplayStart.toInteger() / queries.rows.toInteger()).toString()
+                queries.group= queries.sColumns.tokenize(",")[queries.iSortCol_0.toInteger()]
+                queries.order= queries.sSortDir_0
+
+                def history= reader.getMatchHistory(queries.steamid64)
                 WebCommon.partialQuery(reader, queries, false).each {row ->
-                    data << [c: [[v: row.level, p: leftAlign],
-                        [v: row.difficulty, p: centerAlign],
-                        [v: row.length, p: centerAlign],
-                        [v: row.result, p: centerAlign],
-                        [v: row.wave, p: centerAlign],
-                        [v: row.duration, f: Time.secToStr(row.duration), p: centerAlign],
-                        [v: row.timestamp, p: centerAlign]
-                    ]]
+                    data << [row.level, row.difficulty, row.length, row.result, row.wave, Time.secToStr(row.duration), row.timestamp]
                 }
-                break
+                def root= builder {
+                    sEcho(queries.sEcho.toInteger())
+                    iTotalRecords(history.size())
+                    iTotalDisplayRecords(history.size())
+                    aaData(data)
+                }
+                return builder
             case "wave":
                 def waveSplit= [:], statKeys= new TreeSet()
                 def waveData= queries.level == null ? reader.getWaveData(queries.difficulty, queries.length, queries.group) : 

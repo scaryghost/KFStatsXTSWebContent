@@ -62,11 +62,15 @@ public abstract class PagedTable extends WebPageBase {
                 "sAjaxSource": 'data.json',
                 "sPaginatationType": 'full_numbers',
                 "fnServerData": function (sSource, aoData, fnCallback) {
-                    aoData.push({"name": "table", "value": "$category"});
+                    ${fillAoData()}
                     \$.getJSON(sSource, aoData, function(json) {
                         fnCallback(json)
                     })
                 }
 """
+    }
+
+    protected String fillAoData() {
+        """aoData.push({"name": "table", "value": "$category"})"""
     }
 }

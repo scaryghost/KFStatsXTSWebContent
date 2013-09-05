@@ -7,5 +7,4 @@
     <page name="records.html" script="RecordsHtml.groovy" />
     <page name="profile.html" script="ProfileHtml.groovy" />
     <page name="matchhistory.html" script="MatchHistoryHtml.groovy" />
-    <page name="http/datatable.json" script="DataTableJson.groovy" />
 </webpages>

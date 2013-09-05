@@ -38,8 +38,7 @@ public class RecordsHtml extends PagedTable {
                     { "sTitle": "Losses", "sName": "losses", "aTargets": [ 2 ] },
                     { "sTitle": "Disconnects", "sName": "disconnects", "aTargets": [ 3 ] },
                     { "sTitle": "Time Connected", "sName": "time", "aTargets": [ 4 ] }
-                ],
-""" + super.dataTableOptions()
+                ],""" + super.dataTableOptions()
     
     }
 }
