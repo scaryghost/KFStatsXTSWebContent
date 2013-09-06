@@ -205,7 +205,7 @@ public class DataJson extends Resource {
             case "records":
                     queries.rows= queries.iDisplayLength
                     queries.page= (queries.iDisplayStart.toInteger() / queries.rows.toInteger()).toString()
-                    queries.group= queries.sColumns.tokenize(",")[queries.iSortCol_0.toInteger()]
+                    queries.group= queries.iSortCol_0 == null ? null : queries.sColumns.tokenize(",")[queries.iSortCol_0.toInteger()]
                     queries.order= queries.sSortDir_0
         
                     WebCommon.partialQuery(reader, queries, true).each {row ->

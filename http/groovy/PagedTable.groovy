@@ -10,6 +10,7 @@ public abstract class PagedTable extends WebPageBase {
         this.category= category
         this.formUrl= formUrl
 
+        jsFiles.remove(1)
         jsFiles << 'http/js/jquery.dataTables.min.js'
         stylesheets << 'http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css' << 'http/css/jquery.dataTables_themeroller.css'
     }
@@ -65,19 +66,20 @@ public abstract class PagedTable extends WebPageBase {
                 bFilter: false,
                 bSort: true,
                 bInfo: true,
-                bAutoWidth: true,
+                bAutoWidth: false,
                 bServerSide: true,
                 bJQueryUI: true,
                 iDisplayLength: 25,
                 sAjaxSource: 'data.json',
-                sPaginatationType: 'full_numbers',
+                sPaginationType: 'full_numbers',
                 fnServerData: function (sSource, aoData, fnCallback) {
                     ${fillAoData()}
                     \$.getJSON(sSource, aoData, function(json) {
                         fnCallback(json)
                     })
                 },
-                sScrollY: document.getElementById('${category}_div').offsetHeight * 0.85
+                sScrollY: document.getElementById('${category}_div').offsetHeight * 0.85,
+                aaSorting: []
 """
     }
 
