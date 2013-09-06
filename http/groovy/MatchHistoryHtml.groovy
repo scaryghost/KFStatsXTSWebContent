@@ -1,6 +1,23 @@
 public class MatchHistoryHtml extends PagedTable {
     public MatchHistoryHtml() {
         super("matchhistory", "matchhistory.html")
+
+        aoColumnDefs= """[
+                    { "sTitle": "Level", "sName": "level", "aTargets": [ 0 ] },
+                    { "sTitle": "Difficulty", "sName": "difficulty", "aTargets": [ 1 ] },
+                    { "sTitle": "Length", "sName": "length", "aTargets": [ 2 ] },
+                    { "sTitle": "Result", "sName": "result", "aTargets": [ 3 ] },
+                    { "sTitle": "Wave", "sName": "wave", "aTargets": [ 4 ] },
+                    { "sTitle": "Duration", "sName": "duration", "aTargets": [ 5 ] },
+                    { "sTitle": "Timestamp", "sName": "timestamp", "aTargets": [ 6 ] }
+                ]"""
+
+        dataOptions.aaSorting= [[6, '''"desc"''']]
+    }
+
+    public void setQueries(Map<String, String> queries) {
+        super.setQueries(queries)
+        aoData << """{"name": "steamid64", "value": "${queries.steamid64}"}"""
     }
 
     public String getPageTitle() {
@@ -28,24 +45,5 @@ public class MatchHistoryHtml extends PagedTable {
                 }
             }
         }
-    }
-
-    protected String dataTableOptions() {
-        """
-                "aoColumnDefs": [
-                    { "sTitle": "Level", "sName": "level", "aTargets": [ 0 ] },
-                    { "sTitle": "Difficulty", "sName": "difficulty", "aTargets": [ 1 ] },
-                    { "sTitle": "Length", "sName": "length", "aTargets": [ 2 ] },
-                    { "sTitle": "Result", "sName": "result", "aTargets": [ 3 ] },
-                    { "sTitle": "Wave", "sName": "wave", "aTargets": [ 4 ] },
-                    { "sTitle": "Duration", "sName": "duration", "aTargets": [ 5 ] },
-                    { "sTitle": "Timestamp", "sName": "timestamp", "aTargets": [ 6 ] }
-                ],""" + super.dataTableOptions()
-    
-    }
-
-    protected String fillAoData() {
-        """${super.fillAoData()}
-                    aoData.push({"name": "steamid64", "value": "${queries.steamid64}"})"""
     }
 }

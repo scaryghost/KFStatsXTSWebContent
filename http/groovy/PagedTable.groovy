@@ -4,15 +4,20 @@ import groovy.xml.MarkupBuilder
 
 public abstract class PagedTable extends WebPageBase {
     protected final def category, formUrl
+    protected def dataOptions, aoColumnDefs, aoData
 
     protected PagedTable(def category, def formUrl) {
         super()
         this.category= category
         this.formUrl= formUrl
+        this.dataOptions= [bPaginate: true, bProcessing: true, bLengthChange: false, bFilter: false, bSort: true, bInfo: true, bAutoWidth: false,
+                bServerSide: true, bJQueryUI: true, iDisplayLength: 25, sAjaxSource: 'data.json', sPaginationType: 'full_numbers', aaSorting: []]
 
         jsFiles.remove(1)
         jsFiles << 'http/js/jquery.dataTables.min.js'
         stylesheets << 'http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css' << 'http/css/jquery.dataTables_themeroller.css'
+
+        aoData= ["""{"name": "table", "value": "$category"}"""]
     }
 
     protected void fillVisualizationJS(def builder) {
@@ -20,7 +25,7 @@ public abstract class PagedTable extends WebPageBase {
             mkp.yieldUnescaped("""
         var table;
         \$(document).ready(function() {
-            table= \$('#$category').dataTable({${dataTableOptions()}});
+            table= \$('#$category').dataTable({${getDataTableOptions()}});
         } );
 
         function updatePageSize(pageSize) {
@@ -58,32 +63,33 @@ public abstract class PagedTable extends WebPageBase {
         }
     }
 
-    protected String dataTableOptions() {
+    protected String getDataTableOptions() {
+        def fillAoData= {
+            aoData.inject("") {accum, elem ->
+                accum+= "                    aoData.push($elem);\n"
+            }
+        }
+
+        def options= dataOptions.collect {key, value ->
+            def str= "                $key: "
+            if (value instanceof String) {
+                str+= """'$value'"""
+            } else {
+                str+= "$value"
+            }
+            str
+        }.join(",\n")
+
         """
-                bPaginate: true,
-                bProcessing: true,
-                bLengthChange: false,
-                bFilter: false,
-                bSort: true,
-                bInfo: true,
-                bAutoWidth: false,
-                bServerSide: true,
-                bJQueryUI: true,
-                iDisplayLength: 25,
-                sAjaxSource: 'data.json',
-                sPaginationType: 'full_numbers',
+$options,
+                aoColumnDefs: $aoColumnDefs,
                 fnServerData: function (sSource, aoData, fnCallback) {
-                    ${fillAoData()}
+${fillAoData()}
                     \$.getJSON(sSource, aoData, function(json) {
                         fnCallback(json)
                     })
                 },
                 sScrollY: document.getElementById('${category}_div').offsetHeight * 0.85,
-                aaSorting: []
 """
-    }
-
-    protected String fillAoData() {
-        """aoData.push({"name": "table", "value": "$category"})"""
     }
 }
