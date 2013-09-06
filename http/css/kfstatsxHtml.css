@@ -126,7 +126,7 @@ td {
     padding-left: 5px;
 }
 
-td+td {
+td+td,th+th {
     text-align: center;
 }
 
