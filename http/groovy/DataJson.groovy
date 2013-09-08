@@ -83,45 +83,35 @@ public class DataJson extends Resource {
         public abstract int getNumFilteredRecords()
     }
     
+    private def serverDataClasses, playerDataClasses, defaultClass, dataCp= "data"
+
+    public DataJson() {
+        serverDataDefault= "Default"
+        serverDataClasses= [difficulties: "ServerDifficulty", levels: "ServerLevel", leveldata: "ServerLevelData",
+                difficultyData: "ServerDifficultyData", records: "Records", wave: "Wave"]
+        playerDataClass= [difficulties: "PlayerDifficulty", levels: "PlayerLevel", leveldata: "PlayerLevelData", 
+                difficultyData: "PlayerDifficultyData", matchhistory: "matchhistory"]
+    }
     public String generatePage() {
-/*
-            case "records":
-                queries.rows= queries.iDisplayLength
-                queries.page= (queries.iDisplayStart.toInteger() / queries.rows.toInteger()).toString()
-                queries.group= queries.iSortCol_0 == null ? null : queries.sColumns.tokenize(",")[queries.iSortCol_0.toInteger()]
-                queries.order= queries.sSortDir_0
-        
-                WebCommon.partialQuery(reader, queries, true).each {row ->
-                    def steamInfo= reader.getSteamIDInfo(row.steamid64)
-                    data << ["<a href=profile.html?steamid64=${row.steamid64}>${steamInfo.name}</a>", row.wins.toString(), 
-                            row.losses.toString(), row.disconnects.toString(), Time.secToStr(row.time)]
-                }
+        def gcl= new GroovyClassLoader();
+        gcl.addClasspath(dataCp);
 
-                def root= builder {
-                    sEcho(queries.sEcho.toInteger())
-                    iTotalRecords(reader.getNumRecords())
-                    iTotalDisplayRecords(reader.getNumRecords())
-                    aaData(data)
-                }
-                return builder
-            case "matchhistory":
-                queries.rows= queries.iDisplayLength
-                queries.page= (queries.iDisplayStart.toInteger() / queries.rows.toInteger()).toString()
-                queries.group= queries.iSortCol_0 == null ? null : queries.sColumns.tokenize(",")[queries.iSortCol_0.toInteger()]
-                queries.order= queries.sSortDir_0
+        def getClazz= {classes ->
+            if (classes.containsKey(queries.table)) {
+                return classes[queries.table]
+            }
+            return defaultClass
+        }
 
-                def history= reader.getMatchHistory(queries.steamid64)
-                WebCommon.partialQuery(reader, queries, false).each {row ->
-                    data << [row.level, row.difficulty, row.length, row.result, row.wave, Time.secToStr(row.duration), row.timestamp]
-                }
-                def root= builder {
-                    sEcho(queries.sEcho.toInteger())
-                    iTotalRecords(history.size())
-                    iTotalDisplayRecords(history.size())
-                    aaData(data)
-                }
-                return builder
-*/
+        def creatorCtor, clazz
+        if (queries.steamid64 != null) {
+            clazz= getClazz(serverDataClasses)
+        } else {
+            clazz= getClass(playerDataClasses)
+        }
+        creatorCtor= gcl.parseClass(clazz).getDeclaredConstructors([Object.class])
+
+        return ((DataCreator)creatorCtor.newInstance([reader: reader, queries: queries])).create()
     }
 }
 

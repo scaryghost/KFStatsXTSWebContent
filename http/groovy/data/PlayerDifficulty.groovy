@@ -6,10 +6,10 @@ public class PlayerDifficulty extends GoogleChartsCreator {
             ["Losses", "number"], ["Disconnects", "number"], ["Time", "number"]]
     private final def steamid64
 
-    public PlayerDifficultyCreator(reader, queries) {
+    public PlayerDifficultyCreator(parameters) {
         super(columnNames.collect { [label: it[0], type: it[1]] })
-        this.reader= reader
-        this.steamid64= queries.steamid64
+        this.reader= parameters.reader
+        this.steamid64= parameters.queries.steamid64
     }
 
     public def getData() {

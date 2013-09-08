@@ -4,11 +4,11 @@ import com.github.etsai.utils.Time
 public MatchHistory extends DataTableCreator {
     private final def reader, totalNumRecords, steamid64
 
-    public MatchHistoryCreator(reader, queries) {
-        super(queries)
-        this.reader= reader
-        this.steamid64= queries.steamid64
-        this.totalNumRecords= reader.getMatchHistory(this.steamid64).size()
+    public MatchHistoryCreator(parameters) {
+        super(parameters.queries)
+        this.reader= parameters.reader
+        this.steamid64= parameters.queries.steamid64
+        this.totalNumRecords= parameters.reader.getMatchHistory(this.steamid64).size()
     }
 
     public def getData() {

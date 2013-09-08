@@ -5,10 +5,10 @@ public class ServerLevelData extends GoogleChartsCreator {
     private final def columnNames= [["Difficulty", "string"], ["Length", "string"], ["Wins", "number"], ["Losses", "number"], ["Avg Wave", "number"], ["Time", "number"]]
     private final def reader, level
 
-    public ServerLevelData(reader, queries) {
+    public ServerLevelData(parameters) {
         super(columnNames.collect { [label: it[0], type: it[1]] })
-        this.reader= reader
-        this.level= queires.level
+        this.reader= parameters.reader
+        this.level= parameters.queries.level
     }
 
     public def getData() {

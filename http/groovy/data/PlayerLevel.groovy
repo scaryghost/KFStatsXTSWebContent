@@ -3,11 +3,12 @@ import com.github.etsai.utils.Time
 
 public class PlayerLevel extends GoogleChartsCreator {
     private final def columnsName= [["Level", "string"], ["Wins", "number"], ["Losses", "number"], ["Disconnects", "number"], ["Time", "number"]]
-    private final def reader
+    private final def reader, steamid64
 
-    public PlayerLevel(reader) {
+    public PlayerLevel(parameters) {
         super(columnNames.collect { [label: it[0], type: it[1]] })
-        this.reader= reader
+        this.reader= parameters.reader
+        this.steamid64= parameters.queries.steamid64
     }
     public def getData() {
         def levels= WebCommon.aggregateCombineMatchHistory(reader.getMatchHistory(queries.steamid64), true)

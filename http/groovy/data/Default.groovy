@@ -4,20 +4,20 @@ import com.github.etsai.utils.Time
 public class Default extends GoogleChartsCreator {
     private final def data
 
-    public DefaultData(reader,queries) {
+    public DefaultData(parameters) {
         super()
-        columns= [[queries.table.capitalize(), "string"], ["Count", "number"]].collect {
+        columns= [[parameters.queries.table.capitalize(), "string"], ["Count", "number"]].collect {
             [label: it[0], type: it[1]]
         }
 
-        def results= (queries.steamid64 == null) ?
-            reader.getAggregateData(queries.table) :
-            reader.getAggregateData(queries.table, queries.steamid64)
+        def results= (parameters.queries.steamid64 == null) ?
+            parameters.reader.getAggregateData(parameters.queries.table) :
+            parameters.reader.getAggregateData(parameters.queries.table, parameters.queries.steamid64)
         data= results.collect {row ->
             def fVal= null
             def lower= row.stat.toLowerCase()
 
-            if (queries.table == "perks" || lower.contains('time')) {
+            if (parameters.queries.table == "perks" || lower.contains('time')) {
                 fVal= Time.secToStr(row.value)
             }
             [c: [[v: row.stat], [v: row.value, f: fVal, p: centerAlign]]]

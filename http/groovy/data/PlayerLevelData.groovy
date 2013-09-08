@@ -6,11 +6,11 @@ public class PlayerLevelData extends GoogleChartsCreator {
             ["Losses", "number"], ["Disconnects", "number"], ["Time", "number"]]
     private final def reader, level, steamid64
 
-    public PlayerLdvelData(reader, queries) {
+    public PlayerLdvelData(parameters) {
         super(columnNames.collect { [label: it[0], type: it[1]] })
-        this.reader= reader
-        this.level= queries.level
-        this.steamid64= queries.steamid64
+        this.reader= parameters.reader
+        this.level= parameters.queries.level
+        this.steamid64= parameters.queries.steamid64
     }
 
     public def getData() {

@@ -5,11 +5,11 @@ public class ServerDifficultyData extends GoogleChartsCreator {
     private final def columnName= [["Level", "string"], ["Wins", "number"], ["Losses", "number"], ["Avg Wave", "number"], ["Time", "number"]]
     private final def reader, difficulty, length
 
-    public ServerDifficultyData(reader, queries) {
+    public ServerDifficultyData(parameters) {
         super(columnNames.collect { [label: it[0], type: it[1]] })
-        this.reader= reader
-        this.difficulty= queries.difficulty
-        this.length= queries.length
+        this.reader= parameters.reader
+        this.difficulty= parameters.queries.difficulty
+        this.length= parameters.queries.length
     }
 
     public def getData() {

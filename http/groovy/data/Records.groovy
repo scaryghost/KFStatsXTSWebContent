@@ -4,10 +4,10 @@ import com.github.etsai.utils.Time
 public Records extends DataTableCreator {
     private final def reader, totalNumRecords
 
-    public RecordsCreator(reader, queries) {
+    public RecordsCreator(parameters) {
         super(queries)
-        this.reader= reader
-        this.totalNumRecords= reader.getNumRecords()
+        this.reader= parameters.reader
+        this.totalNumRecords= parameters.reader.getNumRecords()
     }
 
     public def getData() {

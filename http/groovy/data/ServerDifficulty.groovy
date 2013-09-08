@@ -6,9 +6,9 @@ public class ServerDifficulty extends GoogleChartsCreator {
             ["Losses", "number"], ["Avg Wave", "number"], ["Time", "number"]]
     private final def reader
 
-    public ServerDifficultyCreator(reader) {
+    public ServerDifficultyCreator(parameters) {
         super(columnNames.collect { [label: it[0], type: it[1]] })
-        this.reader= reader
+        this.reader= parameters.reader
     }
 
     public def getData() {
