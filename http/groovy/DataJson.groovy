@@ -59,7 +59,6 @@ public class DataJson extends Resource {
 
     public abstract class DataTableCreator implements DataCreator {
         protected def pageSize, start, end, order, group, sEcho
-
         public DataTableCreator(def queries) {
             pageSize= queries.iDisplayLength.toInteger()
             start= queries.iDisplayStart.toInteger()
@@ -85,6 +84,44 @@ public class DataJson extends Resource {
     }
     
     public String generatePage() {
+/*
+            case "records":
+                queries.rows= queries.iDisplayLength
+                queries.page= (queries.iDisplayStart.toInteger() / queries.rows.toInteger()).toString()
+                queries.group= queries.iSortCol_0 == null ? null : queries.sColumns.tokenize(",")[queries.iSortCol_0.toInteger()]
+                queries.order= queries.sSortDir_0
+        
+                WebCommon.partialQuery(reader, queries, true).each {row ->
+                    def steamInfo= reader.getSteamIDInfo(row.steamid64)
+                    data << ["<a href=profile.html?steamid64=${row.steamid64}>${steamInfo.name}</a>", row.wins.toString(), 
+                            row.losses.toString(), row.disconnects.toString(), Time.secToStr(row.time)]
+                }
+
+                def root= builder {
+                    sEcho(queries.sEcho.toInteger())
+                    iTotalRecords(reader.getNumRecords())
+                    iTotalDisplayRecords(reader.getNumRecords())
+                    aaData(data)
+                }
+                return builder
+            case "matchhistory":
+                queries.rows= queries.iDisplayLength
+                queries.page= (queries.iDisplayStart.toInteger() / queries.rows.toInteger()).toString()
+                queries.group= queries.iSortCol_0 == null ? null : queries.sColumns.tokenize(",")[queries.iSortCol_0.toInteger()]
+                queries.order= queries.sSortDir_0
+
+                def history= reader.getMatchHistory(queries.steamid64)
+                WebCommon.partialQuery(reader, queries, false).each {row ->
+                    data << [row.level, row.difficulty, row.length, row.result, row.wave, Time.secToStr(row.duration), row.timestamp]
+                }
+                def root= builder {
+                    sEcho(queries.sEcho.toInteger())
+                    iTotalRecords(history.size())
+                    iTotalDisplayRecords(history.size())
+                    aaData(data)
+                }
+                return builder
+*/
     }
 }
 
