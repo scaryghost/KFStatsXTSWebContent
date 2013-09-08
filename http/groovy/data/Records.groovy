@@ -1,7 +1,7 @@
 import DataJson.DataTableCreator
 import com.github.etsai.utils.Time
 
-public RecordsCreator extends DataTableCreator {
+public Records extends DataTableCreator {
     private final def reader, totalNumRecords
 
     public RecordsCreator(reader, queries) {

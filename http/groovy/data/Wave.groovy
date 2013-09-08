@@ -1,7 +1,7 @@
 import DataJson.GoogleChartsCreator
 import com.github.etsai.utils.Time
 
-public class WaveData extends GoogleChartsCreator {
+public class Wave extends GoogleChartsCreator {
     private final def data
 
     public WaveData(reader, queries) {

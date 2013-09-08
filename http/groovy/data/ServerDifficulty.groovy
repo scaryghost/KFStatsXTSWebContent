@@ -1,7 +1,7 @@
 import DataJson.GoogleChartsCreator
 import com.github.etsai.utils.Time
 
-public class ServerDifficultyCreator extends GoogleChartsCreator {
+public class ServerDifficulty extends GoogleChartsCreator {
     private final def columnNames= [["Difficulty", "string"], ["Length", "string"], ["Wins", "number"],
             ["Losses", "number"], ["Avg Wave", "number"], ["Time", "number"]]
     private final def reader

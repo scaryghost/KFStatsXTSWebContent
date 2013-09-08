@@ -1,7 +1,7 @@
 import DataJson.DataTableCreator
 import com.github.etsai.utils.Time
 
-public MatchHistoryCreator extends DataTableCreator {
+public MatchHistory extends DataTableCreator {
     private final def reader, totalNumRecords, steamid64
 
     public MatchHistoryCreator(reader, queries) {

@@ -1,7 +1,7 @@
 import DataJson.GoogleChartsCreator
 import com.github.etsai.utils.Time
 
-public class DefaultData extends GoogleChartsCreator {
+public class Default extends GoogleChartsCreator {
     private final def data
 
     public DefaultData(reader,queries) {
