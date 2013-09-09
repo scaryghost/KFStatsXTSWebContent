@@ -1,12 +1,11 @@
-import DataJson.GoogleChartsCreator
 import com.github.etsai.utils.Time
 
 public class PlayerDifficulty extends GoogleChartsCreator {
-    private final def columnInfo= [["Difficulty", "string"], ["Length", "string"], ["Wins", "number"],
+    private final static def columnNames= [["Difficulty", "string"], ["Length", "string"], ["Wins", "number"],
             ["Losses", "number"], ["Disconnects", "number"], ["Time", "number"]]
-    private final def steamid64
+    private final def steamid64, reader
 
-    public PlayerDifficultyCreator(parameters) {
+    public PlayerDifficulty(Map parameters) {
         super(columnNames.collect { [label: it[0], type: it[1]] })
         this.reader= parameters.reader
         this.steamid64= parameters.queries.steamid64
@@ -18,7 +17,9 @@ public class PlayerDifficulty extends GoogleChartsCreator {
 
         def totals= [win: 0, loss: 0, disconnect:0, time:0]
         difficulties.each {setting, stats ->
-            data << [c: [[v: setting[0], f:"<a href='javascript:open({\"table\":\"difficultydata\",\"title\":\"${setting[0]} - ${setting[1]}\",\"difficulty\":\"${setting[0]}\",\"length\":\"${setting[1]}\",\"steamid64\":\"${steamid64}\"})'>${setting[0]}</a>"], [v: setting[1]]].plus(matchHistoryResults(stats))]
+            data << [c: [[v: setting[0], f:"<a href='javascript:open({\"table\":\"difficultydata\",\"title\":\"${setting[0]} - ${setting[1]}\",\"difficulty\":\"${setting[0]}\",\"length\":\"${setting[1]}\",\"steamid64\":\"${steamid64}\"})'>${setting[0]}</a>"], 
+                [v: setting[1]
+            ]].plus(matchHistoryResults(stats))]
             stats.each {stat, value ->
                 totals[stat]+= value
             }

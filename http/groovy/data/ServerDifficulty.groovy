@@ -1,12 +1,11 @@
-import DataJson.GoogleChartsCreator
 import com.github.etsai.utils.Time
 
 public class ServerDifficulty extends GoogleChartsCreator {
-    private final def columnNames= [["Difficulty", "string"], ["Length", "string"], ["Wins", "number"],
+    private final static def columnNames= [["Difficulty", "string"], ["Length", "string"], ["Wins", "number"],
             ["Losses", "number"], ["Avg Wave", "number"], ["Time", "number"]]
     private final def reader
 
-    public ServerDifficultyCreator(parameters) {
+    public ServerDifficulty(Map parameters) {
         super(columnNames.collect { [label: it[0], type: it[1]] })
         this.reader= parameters.reader
     }

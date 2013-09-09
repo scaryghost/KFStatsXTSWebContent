@@ -1,10 +1,9 @@
-import DataJson.GoogleChartsCreator
 import com.github.etsai.utils.Time
 
 public class Default extends GoogleChartsCreator {
     private final def data
 
-    public DefaultData(parameters) {
+    public Default(Map parameters) {
         super()
         columns= [[parameters.queries.table.capitalize(), "string"], ["Count", "number"]].collect {
             [label: it[0], type: it[1]]

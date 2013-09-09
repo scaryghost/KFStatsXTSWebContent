@@ -1,11 +1,11 @@
-import DataJson.DataTableCreator
 import com.github.etsai.utils.Time
 
-public Records extends DataTableCreator {
+public class Records extends DataTableCreator {
     private final def reader, totalNumRecords
 
-    public RecordsCreator(parameters) {
-        super(queries)
+    public Records(Map parameters) {
+        super(parameters.queries)
+        System.err.println "Error!"
         this.reader= parameters.reader
         this.totalNumRecords= parameters.reader.getNumRecords()
     }

@@ -1,10 +1,9 @@
-import DataJson.DataTableCreator
 import com.github.etsai.utils.Time
 
-public MatchHistory extends DataTableCreator {
+public class MatchHistory extends DataTableCreator {
     private final def reader, totalNumRecords, steamid64
 
-    public MatchHistoryCreator(parameters) {
+    public MatchHistory(Map parameters) {
         super(parameters.queries)
         this.reader= parameters.reader
         this.steamid64= parameters.queries.steamid64
@@ -14,7 +13,7 @@ public MatchHistory extends DataTableCreator {
     public def getData() {
         def data= []
 
-        reader.getMatchHistory(queries.steamid64, group, order, start, end).each {row ->
+        reader.getMatchHistory(steamid64, group, order, start, end).each {row ->
             data << [row.level, row.difficulty, row.length, row.result, row.wave, 
                     Time.secToStr(row.duration), row.timestamp]
         }

@@ -1,10 +1,9 @@
-import DataJson.GoogleChartsCreator
 import com.github.etsai.utils.Time
 
 public class Wave extends GoogleChartsCreator {
     private final def data
 
-    public WaveData(parameters) {
+    public Wave(Map parameters) {
         super()
 
         def waveSplit= [:], statKeys= new TreeSet()
