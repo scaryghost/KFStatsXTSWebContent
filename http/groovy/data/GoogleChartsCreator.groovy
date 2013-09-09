@@ -6,7 +6,6 @@ public abstract class GoogleChartsCreator implements DataCreator {
     protected def centerAlign= [style: "text-align:center"], leftAlign= [style: "text-align:left"]
 
     public GoogleChartsCreator() {
-        System.err.println "GoogleChartsCreator Ctor"
     }
 
     public GoogleChartsCreator(columns) {

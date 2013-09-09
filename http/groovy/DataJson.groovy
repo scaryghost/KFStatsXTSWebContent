@@ -13,18 +13,20 @@ import com.github.etsai.utils.Time
  * @author etsai
  */
 public class DataJson extends Resource {
-    private def serverDataClasses, playerDataClasses, defaultClass="Default.groovy", dataCp= "http/groovy/data"
+    private def serverDataClasses, playerDataClasses, baseClasspath, defaultClass="Default.groovy", dataDir= "data"
 
     public DataJson() {
         serverDataClasses= [difficulties: "ServerDifficulty.groovy", levels: "ServerLevel.groovy", leveldata: "ServerLevelData.groovy",
                 difficultyData: "ServerDifficultyData.groovy", records: "Records.groovy", wave: "Wave.groovy"]
         playerDataClasses= [difficulties: "PlayerDifficulty.groovy", levels: "PlayerLevel.groovy", leveldata: "PlayerLevelData.groovy", 
                 difficultyData: "PlayerDifficultyData.groovy", matchhistory: "MatchHistory.groovy"]
+        baseClasspath= new File(getClass().protectionDomain.codeSource.location.path).getParent()
     }
     public String generatePage() {
+        def dataClasspath= new File(baseClasspath, dataDir)
         def gcl= new GroovyClassLoader();
-        gcl.addClasspath(dataCp);
-        gcl.addClasspath("http/groovy")
+        gcl.addClasspath(baseClasspath);
+        gcl.addClasspath(dataClasspath.toString())
 
         def getClass= {classes ->
             if (classes.containsKey(queries.table)) {
@@ -40,7 +42,7 @@ public class DataJson extends Resource {
             clazz= getClass(playerDataClasses)
         }
 
-        creatorCtor= gcl.parseClass(new File("http/groovy/data/",clazz)).getDeclaredConstructor([Map.class] as Class[])
+        creatorCtor= gcl.parseClass(new File(dataClasspath,clazz)).getDeclaredConstructor([Map.class] as Class[])
         return creatorCtor.newInstance([reader: reader, queries: queries]).create()
     }
 }
