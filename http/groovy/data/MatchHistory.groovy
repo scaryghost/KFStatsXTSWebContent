@@ -7,7 +7,7 @@ public class MatchHistory extends DataTableCreator {
         super(parameters.queries)
         this.reader= parameters.reader
         this.steamid64= parameters.queries.steamid64
-        this.totalNumRecords= parameters.reader.getMatchHistory(this.steamid64).size()
+        this.totalNumRecords= parameters.reader.getNumMatches(this.steamid64)
     }
 
     public def getData() {
