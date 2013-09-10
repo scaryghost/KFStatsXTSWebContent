@@ -17,9 +17,9 @@ public class DataJson extends Resource {
 
     public DataJson() {
         serverDataClasses= [difficulties: "ServerDifficulty.groovy", levels: "ServerLevel.groovy", leveldata: "ServerLevelData.groovy",
-                difficultyData: "ServerDifficultyData.groovy", records: "Records.groovy", wave: "Wave.groovy"]
+                difficultyData: "ServerDifficultyData.groovy", records: "Records.groovy", wave: "Wave.groovy", totals: "ServerTotals.groovy"]
         playerDataClasses= [difficulties: "PlayerDifficulty.groovy", levels: "PlayerLevel.groovy", leveldata: "PlayerLevelData.groovy", 
-                difficultyData: "PlayerDifficultyData.groovy", matchhistory: "MatchHistory.groovy"]
+                difficultyData: "PlayerDifficultyData.groovy", matchhistory: "MatchHistory.groovy", profile: "PlayerProfile.groovy"]
         baseClasspath= new File(getClass().protectionDomain.codeSource.location.path).getParent()
     }
     public String generatePage() {

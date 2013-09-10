@@ -19,14 +19,13 @@ public abstract class WebPageBase extends Resource {
         }
     """
 
-    protected def htmlDiv, navigation, categoryMthd, dataHtml, dataJson
+    protected def htmlDiv, navigation, categoryMthd, dataJson
     protected def stylesheets= ['http/css/kfstatsxHtml.css']
     protected def jsFiles= ['//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js',
             'https://www.google.com/jsapi?autoload={"modules":[{"name":"visualization","version":"1","packages":["controls"]}]}']
 
     public WebPageBase() {
         htmlDiv= new HashSet()
-        dataHtml= new DataHtml()
         dataJson= new DataJson()
         navigation= []
     }
@@ -41,12 +40,10 @@ public abstract class WebPageBase extends Resource {
 
     public void setDataReader(DataReader reader) {
         super.setDataReader(reader);
-        dataHtml.setDataReader(reader);
         dataJson.setDataReader(reader);
     }
     public void setQueries(Map<String, String> queries) {
         super.setQueries(queries);
-        dataHtml.setQueries(queries);
         dataJson.setQueries(queries);
     }
     public String generatePage() {

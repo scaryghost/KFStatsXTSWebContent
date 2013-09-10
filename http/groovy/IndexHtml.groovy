@@ -37,7 +37,7 @@ public class IndexHtml extends WebPageBase {
             def divName= chartTypes[navItem] == null ? "${navItem}_div" : navItem
             queries.table= navItem
             if (htmlDiv.contains(navItem)) {
-                stndChartsParams << [dataHtml.generatePage(), null, divName, null]
+                stndChartsParams << [dataJson.generatePage(), null, divName, null]
             } else {
                 stndChartsParams << [dataJson.generatePage(), navItem, divName, chartTypes[navItem]]
             }
