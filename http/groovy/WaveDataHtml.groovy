@@ -39,11 +39,11 @@ public class WaveDataHtml extends WebPageBase {
         queries.table= "wave"
         navigation.each {item ->
             queries.group= item
-            parameters << [dataJson.generatePage(), item]
+            parameters << [dataDispatcher.generatePage(), item]
         }
         if (queries.level == null) {
             queries.table= "difficultydata"
-            parameters << [dataJson.generatePage(), 'Levels', 'levels_div']
+            parameters << [dataDispatcher.generatePage(), 'Levels', 'levels_div']
         }
         builder.script(type: 'text/javascript') {
             mkp.yieldUnescaped(dashboardVisualization(parameters))

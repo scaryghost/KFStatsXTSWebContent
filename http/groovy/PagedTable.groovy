@@ -11,7 +11,7 @@ public abstract class PagedTable extends WebPageBase {
         this.category= category
         this.formUrl= formUrl
         this.dataOptions= [bPaginate: true, bProcessing: true, bLengthChange: false, bFilter: false, bSort: true, bInfo: true, bAutoWidth: false,
-                bServerSide: true, bJQueryUI: true, iDisplayLength: 25, sAjaxSource: 'data.json', sPaginationType: 'full_numbers', aaSorting: []]
+                bServerSide: true, bJQueryUI: true, iDisplayLength: 25, sAjaxSource: 'datadispatcher.php', sPaginationType: 'full_numbers', aaSorting: []]
 
         jsFiles.remove(1)
         jsFiles << 'http/js/jquery.dataTables.min.js'

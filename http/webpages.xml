@@ -1,7 +1,6 @@
 <webpages classpath="groovy">
     <page name="" script="IndexHtml.groovy" />
-    <page name="data.html" script="DataHtml.groovy" />
-    <page name="data.json" script="DataJson.groovy" />
+    <page name="datadispatcher.php" script="DataDispatcher.groovy" />
     <page name="wavedata.html" script="WaveDataHtml.groovy" />
     <page name="index.html" script="IndexHtml.groovy" />
     <page name="records.html" script="RecordsHtml.groovy" />

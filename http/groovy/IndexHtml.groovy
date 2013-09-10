@@ -37,9 +37,9 @@ public class IndexHtml extends WebPageBase {
             def divName= chartTypes[navItem] == null ? "${navItem}_div" : navItem
             queries.table= navItem
             if (htmlDiv.contains(navItem)) {
-                stndChartsParams << [dataJson.generatePage(), null, divName, null]
+                stndChartsParams << [dataDispatcher.generatePage(), null, divName, null]
             } else {
-                stndChartsParams << [dataJson.generatePage(), navItem, divName, chartTypes[navItem]]
+                stndChartsParams << [dataDispatcher.generatePage(), navItem, divName, chartTypes[navItem]]
             }
         }
         builder.script(type: 'text/javascript') {
@@ -78,7 +78,7 @@ public class IndexHtml extends WebPageBase {
                 }
                 query+= keys[index] + "=" + opts[keys[index]];
             }
-            var data= \$.ajax({url: "data.json?" + query, dataType:"json", async: false}).responseText;
+            var data= \$.ajax({url: "datadispatcher.php?" + query, dataType:"json", async: false}).responseText;
             drawChart(data, 'Difficulties', 'dialog', 'Table');
         }
         """

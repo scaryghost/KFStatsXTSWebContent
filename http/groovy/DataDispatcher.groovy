@@ -9,13 +9,13 @@ import com.github.etsai.kfsxtrackingserver.web.Resource
 import com.github.etsai.utils.Time
 
 /**
- * Generates the json data for the page data.json
+ * Generates the json data for the page datadispatcher.php
  * @author etsai
  */
-public class DataJson extends Resource {
+public class DataDispatcher extends Resource {
     private def serverDataClasses, playerDataClasses, baseClasspath, defaultClass="Default.groovy", dataDir= "data"
 
-    public DataJson() {
+    public DataDispatcher() {
         serverDataClasses= [difficulties: "ServerDifficulty.groovy", levels: "ServerLevel.groovy", leveldata: "ServerLevelData.groovy",
                 difficultyData: "ServerDifficultyData.groovy", records: "Records.groovy", wave: "Wave.groovy", totals: "ServerTotals.groovy"]
         playerDataClasses= [difficulties: "PlayerDifficulty.groovy", levels: "PlayerLevel.groovy", leveldata: "PlayerLevelData.groovy", 
