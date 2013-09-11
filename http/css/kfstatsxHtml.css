@@ -163,3 +163,6 @@ th {
     border-radius:10px;
 }
 
+div.player-search {
+    text-align:right;
+}

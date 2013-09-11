@@ -6,12 +6,19 @@ public abstract class PagedTable extends WebPageBase {
     protected final def category, formUrl
     protected def dataOptions, aoColumnDefs, aoData
 
-    protected PagedTable(def category, def formUrl) {
+    public PagedTable(def category, def formUrl) {
         super()
+
+        def fillClass= {top ->
+            def ch= top ? "t" : "b";
+            "fg-toolbar ui-toolbar ui-widget-header ui-corner-${ch}l ui-corner-${ch}r ui-helper-clearfix"
+        }
         this.category= category
         this.formUrl= formUrl
-        this.dataOptions= [bPaginate: true, bProcessing: true, bLengthChange: false, bFilter: false, bSort: true, bInfo: true, bAutoWidth: false,
-                bServerSide: true, bJQueryUI: true, iDisplayLength: 25, sAjaxSource: 'datadispatcher.php', sPaginationType: 'full_numbers', aaSorting: []]
+        this.dataOptions= [bPaginate: true, bProcessing: true, bLengthChange: true, bFilter: false, bSort: true, bInfo: true, bAutoWidth: false,
+                bServerSide: true, bJQueryUI: true, iDisplayLength: 25, sAjaxSource: 'datadispatcher.php', sPaginationType: 'full_numbers', 
+                aLengthMenu: [[25, 50, 100, 250], [25, 50, 100, 250]], aaSorting: [], 
+                sDom: """'<"${fillClass(true)}"l<"player-search">>rt<"${fillClass(false)}"ip><"clear">'"""]
 
         jsFiles.remove(1)
         jsFiles << 'http/js/jquery.dataTables.min.js'
@@ -21,44 +28,26 @@ public abstract class PagedTable extends WebPageBase {
     }
 
     protected void fillVisualizationJS(def builder) {
+        def writer= new StringWriter()
+        def formBuilder= new MarkupBuilder(new IndentPrinter(new PrintWriter(writer), "", false))
+        formBuilder.form(action:formUrl, method:'get') {
+            mkp.yieldUnescaped("Enter player's <a href='http://steamidconverter.com/' target='_blank'>steamID64 </a>")
+            input(type:'text', name:'steamid64')
+            input(type:'submit', value:'Search Player')
+        }
         builder.script(type: 'text/javascript') {
             mkp.yieldUnescaped("""
         var table;
         \$(document).ready(function() {
             table= \$('#$category').dataTable({${getDataTableOptions()}});
+            \$("div.player-search").html("$writer");
         } );
-
-        function updatePageSize(pageSize) {
-            table.fnSettings()._iDisplayLength= pageSize;
-            table.fnDraw();
-        }
   """)
         }
     }
 
     protected void fillContentBoxes(def builder) {
         builder.div(id:"${category}_div", class:'contentbox') {
-            table(style:"border-collapse: collapse; width:100%") {
-                tr() {
-                    td() {
-                        form(action:'', 'Number of rows') {
-                            select(onchange:'updatePageSize(parseInt(this.value, 10))') {
-                                option(selected:"selected", value:'25', '25')
-                                option(value:'50', '50')
-                                option(value:'100', '100')
-                                option(value:'250', '250')
-                            }
-                        }
-                    }
-                    td(style: "text-align: right") {
-                        form(action:formUrl, method:'get') {
-                            mkp.yieldUnescaped("Enter player's <a href='http://steamidconverter.com/' target='_blank'>steamID64 </a>")
-                            input(type:'text', name:'steamid64')
-                            input(type:'submit', value:'Search Player')
-                        }
-                    }
-                }
-            }
             table(id:"$category", '')
         }
     }
@@ -89,7 +78,7 @@ ${fillAoData()}
                         fnCallback(json)
                     })
                 },
-                sScrollY: document.getElementById('${category}_div').offsetHeight * 0.85,
-"""
+                sScrollY: document.getElementById('${category}_div').offsetHeight * 0.85
+            """
     }
 }
