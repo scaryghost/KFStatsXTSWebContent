@@ -1,3 +1,5 @@
+import com.github.etsai.utils.Time
+
 public class PlayerProfile extends HtmlTableCreator {
     private final def reader, steamid64
 
@@ -26,7 +28,7 @@ public class PlayerProfile extends HtmlTableCreator {
             }
             steamIdInfo= reader.getSteamIDInfo(steamid64)
         }
-        xml.table(tableAttr) {
+        builder.table(tableAttr) {
             thead() {
                 tr() {
                     th(colspan: "3") {
@@ -34,10 +36,10 @@ public class PlayerProfile extends HtmlTableCreator {
                     }
                 }
             }
-            xml.tbody() {
+            tbody() {
                 def even= false, first= true
                 stats.each {stat, value ->
-                    xml.tr(class: (even ? "even-row" : "odd-row")) {
+                    tr(class: (even ? "even-row" : "odd-row")) {
                         td(keys[stat])
                         td(stat.contains("time") ? (row == null ? "---" : Time.secToStr(value)) : value)
                         if (first) {

@@ -5,7 +5,6 @@ public class Records extends DataTableCreator {
 
     public Records(Map parameters) {
         super(parameters.queries)
-        System.err.println "Error!"
         this.reader= parameters.reader
         this.totalNumRecords= parameters.reader.getNumRecords()
     }
