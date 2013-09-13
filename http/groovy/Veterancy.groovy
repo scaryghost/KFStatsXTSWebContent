@@ -14,7 +14,10 @@ public class Veterancy {
     public Veterancy(def steamID64) {
         def url= new URL("http://steamcommunity.com/profiles/${steamID64}/statsfeed/1250")
         def content= url.getContent().readLines().join("\n")
-        xmlRoot= new XmlSlurper().parseText(content)
+        
+        if (!content.contains("Error")) {
+            xmlRoot= new XmlSlurper().parseText(content)
+        }
     }
 
     public def getPerks() {
@@ -23,8 +26,8 @@ public class Veterancy {
 
     public def getPlayerProgress(def stat) {
         if (playerProgress[stat] == null) {
-            def item= xmlRoot.stats.item.find { it.APIName.text() == stat }
-            playerProgress[stat]= item.value.text().toInteger()
+            playerProgress[stat]= xmlRoot == null ? 0 : 
+                    xmlRoot.stats.item.find { it.APIName.text() == stat }.value.text().toInteger()
         }
         return playerProgress[stat]
     }
