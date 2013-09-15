@@ -24,7 +24,9 @@ public class Wave extends GoogleChartsCreator {
         columns= columns.collect{[label: it[0], type: it[1]]}
 
         data= waveSplit.collect {waveNum, stats ->
-            [c: statKeys.collect { [v:stats[it] == null ? 0 : stats[it] }, [v:waveNum.toString()]]
+            [c: [[v:waveNum.toString()]].plus(statKeys.collect {key ->
+                [v:stats[key] == null ? 0 : stats[key]]
+            })]
         }
     }
 

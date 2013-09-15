@@ -1,7 +1,8 @@
 import com.github.etsai.utils.Time
 
 public class ServerDifficultyData extends GoogleChartsCreator {
-    private final def columnName= [["Level", "string"], ["Wins", "number"], ["Losses", "number"], ["Avg Wave", "number"], ["Time", "number"]]
+    private static final def columnNames= [["Level", "string"], ["Wins", "number"], ["Losses", "number"], 
+            ["Avg Wave", "number"], ["Time", "number"]]
     private final def reader, difficulty, length
 
     public ServerDifficultyData(Map parameters) {
