@@ -4,7 +4,7 @@ public class PlayerDifficultyData extends GoogleChartsCreator {
     private final static def columnNames= [["Level", "string"], ["Wins", "number"], ["Losses", "number"], ["Disconnects", "number"], ["Time", "number"]]
     private final def reader, steamid64, difficulty, length
 
-    public PlayerDifficulty(Map parameters) {
+    public PlayerDifficultyData(Map parameters) {
         super(columnNames.collect { [label: it[0], type: it[1]] })
         this.reader= parameters.reader
         this.steamid64= parameters.queries.steamid64

@@ -5,7 +5,7 @@ public class PlayerLevelData extends GoogleChartsCreator {
             ["Losses", "number"], ["Disconnects", "number"], ["Time", "number"]]
     private final def reader, level, steamid64
 
-    public PlayerLdvelData(Map parameters) {
+    public PlayerLevelData(Map parameters) {
         super(columnNames.collect { [label: it[0], type: it[1]] })
         this.reader= parameters.reader
         this.level= parameters.queries.level

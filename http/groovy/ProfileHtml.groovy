@@ -65,6 +65,7 @@ public class ProfileHtml extends IndexHtml {
         }.join("")
 
         return """
+        ${super.generateDialogJS()}
         function showPerkLevel(steamID64) {
             \$("#dialog").dialog("open");
 ${js}
