@@ -21,8 +21,8 @@ public abstract class PagedTable extends WebPageBase {
                 sDom: """'<"${fillClass(true)}"l<"player-search">>rt<"${fillClass(false)}"ip><"clear">'"""]
 
         jsFiles.remove(1)
-        jsFiles << 'http/js/jquery.dataTables.min.js'
-        stylesheets << 'http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css' << 'http/css/jquery.dataTables_themeroller.css'
+        jsFiles << 'js/jquery.dataTables.min.js'
+        stylesheets << 'http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css' << 'css/jquery.dataTables_themeroller.css'
 
         aoData= ["""{"name": "table", "value": "$category"}"""]
     }

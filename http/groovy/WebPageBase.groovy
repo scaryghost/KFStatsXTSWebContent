@@ -20,7 +20,7 @@ public abstract class WebPageBase extends Resource {
     """
 
     protected def htmlDiv, navigation, categoryMthd, dataDispatcher
-    protected def stylesheets= ['http/css/kfstatsxHtml.css']
+    protected def stylesheets= ['css/kfstatsxHtml.css']
     protected def jsFiles= ['//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js',
             'https://www.google.com/jsapi?autoload={"modules":[{"name":"visualization","version":"1","packages":["controls"]}]}']
 
@@ -65,7 +65,7 @@ public abstract class WebPageBase extends Resource {
                 stylesheets.each {filename ->
                     link(href: filename, rel:'stylesheet', type:'text/css')
                 }
-                link(rel:'shortcut icon', href: 'http/ico/favicon.ico')
+                link(rel:'shortcut icon', href: 'ico/favicon.ico')
                 
                 jsFiles.each {filename ->
                     script(type:'text/javascript', src:filename, '')
