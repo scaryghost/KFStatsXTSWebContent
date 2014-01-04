@@ -1,4 +1,4 @@
-import com.github.etsai.kfsxtrackingserver.DataReader
+import com.github.etsai.kfsxtrackingserver.Reader
 import com.github.etsai.kfsxtrackingserver.web.Resource
 import groovy.xml.MarkupBuilder
 
@@ -38,7 +38,7 @@ public abstract class WebPageBase extends Resource {
     protected abstract void fillVisualizationJS(def builder)
     protected abstract void fillContentBoxes(def builder)
 
-    public void setDataReader(DataReader reader) {
+    public void setDataReader(Reader reader) {
         super.setDataReader(reader);
         dataDispatcher.setDataReader(reader);
     }
@@ -55,7 +55,7 @@ public abstract class WebPageBase extends Resource {
             return writer
         }
         if (categoryMthd != null) {
-            navigation= navigation.plus(reader.class.getDeclaredMethod(categoryMthd).invoke(reader))
+            navigation= navigation.plus(reader.executeQuery(categoryMthd))
         }
         htmlBuilder.html() {
             htmlBuilder.head() {

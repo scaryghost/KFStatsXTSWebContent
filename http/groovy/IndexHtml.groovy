@@ -1,4 +1,3 @@
-import com.github.etsai.kfsxtrackingserver.DataReader
 import com.github.etsai.kfsxtrackingserver.web.Resource
 import com.github.etsai.utils.Time
 
@@ -9,7 +8,7 @@ public class IndexHtml extends WebPageBase {
         super()
         htmlDiv << "totals"
         navigation= ["totals", "difficulties", "levels"]
-        categoryMthd= "getStatCategories"
+        categoryMthd= "server_categories"
         stylesheets << 'http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css'
         jsFiles << 'http://code.jquery.com/ui/1.10.3/jquery-ui.js'
     }
@@ -128,7 +127,7 @@ $chartCalls
                 }
                 builder.'stats'(category:"difficulties") {
                     def accum= [wins: 0, losses: 0, time: 0]
-                    reader.getDifficulties().each {difficulty ->
+                    reader.executeQuery("server_difficulties").each {difficulty ->
                         def attr= [name: difficulty.name, length: difficulty.length, wins: difficulty.wins, losses: difficulty.losses, time: difficulty.time]
                         accum.keySet().each {key ->
                             accum[key]+= attr[key]
@@ -136,7 +135,7 @@ $chartCalls
     
                         attr["avg-wave"]= String.format("%.2f", WebCommon.computeAvgWave(difficulty))
                         'entry'(attr) {
-                            reader.getDifficultyData(difficulty.name, difficulty.length).each {data ->
+                            reader.executeQuery("server_difficulty_data", difficulty.name, difficulty.length).each {data ->
                                 def dataAttr= [name: data.level, wins: data.wins, losses: data.losses, time: data.time]
                                 dataAttr["avg-wave"]= String.format("%.2f", WebCommon.computeAvgWave(data))
                                 builder.'difficulty'(dataAttr) {
@@ -154,7 +153,7 @@ $chartCalls
                 }
                 builder.'stats'(category:"levels") {
                     def accum= [wins: 0, losses: 0, time: 0]
-                    reader.getLevels().each {level ->
+                    reader.executeQuery("server_levels").each {level ->
                         def levelAttr= [name: level.name, wins: level.wins, losses: level.losses, time: level.time]
                         accum.keySet().each {key ->
                             accum[key]+= levelAttr[key]
@@ -162,7 +161,7 @@ $chartCalls
                         
                         'entry'(levelAttr) {
                             'formatted-time'(Time.secToStr(accum.time))
-                            reader.getLevelData(level.name).each {data ->
+                            reader.executeQuery("server_level_data", level.name).each {data ->
                                 def dataAttr= [name: data.difficulty, length: data.length, wins: data.wins, losses: data.losses, time: data.time]
                                 dataAttr["avg-wave"]= String.format("%.2f", WebCommon.computeAvgWave(data))
                                 builder.'difficulty'(dataAttr) {
@@ -176,9 +175,9 @@ $chartCalls
                         'formatted-time'(Time.secToStr(accum.time))
                     }
                 }
-                reader.getStatCategories().each {category ->
+                reader.executeQuery("server_categories").each {category ->
                     builder.'stats'(category: category) {
-                        reader.getAggregateData(category).each {stat ->
+                        reader.executeQuery("server_aggregate_data", category).each {stat ->
                             def attr= [stat: stat.stat, value: stat.value]
                             'entry'(attr) {
                                 if (category == "perks" || stat.stat.toLowerCase().contains("time")) {

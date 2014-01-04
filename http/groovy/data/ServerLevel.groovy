@@ -11,7 +11,7 @@ public class ServerLevel extends GoogleChartsCreator {
     public def getData() {
         def totals= [wins: 0, losses: 0, time: 0]
         def data= []
-        reader.getLevels().each {row ->
+        reader.executeQuery("server_levels").each {row ->
             data << [c: [[v: row.name, f:"<a href='javascript:open({\"table\":\"leveldata\",\"level\":\"${row.name}\"})'>${row.name}</a>"], 
                 [v: row.wins, p: centerAlign],
                 [v: row.losses, p: centerAlign],

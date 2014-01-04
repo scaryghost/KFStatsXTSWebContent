@@ -85,11 +85,11 @@ public class WebCommon {
 
     public static def generateSummary(reader) {
         def games= 0, playTime= 0, playerCount
-        reader.getDifficulties().each {row ->
+        reader.executeQuery("server_difficulties").each {row ->
                 games+= row.wins + row.losses
                 playTime+= row.time
         }
-        playerCount= reader.getNumRecords()
+        playerCount= reader.executeQuery("server_num_record")
 
         return [["Games", games], ["Play Time", Time.secToStr(playTime)], ["Player Count", playerCount]].collect {
             [name: it[0], value: it[1]]

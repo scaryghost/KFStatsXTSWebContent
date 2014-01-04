@@ -10,8 +10,8 @@ public class Default extends GoogleChartsCreator {
         }
 
         def results= (parameters.queries.steamid64 == null) ?
-            parameters.reader.getAggregateData(parameters.queries.table) :
-            parameters.reader.getAggregateData(parameters.queries.table, parameters.queries.steamid64)
+            parameters.reader.executeQuery("server_aggregate_data", parameters.queries.table) :
+            parameters.reader.executeQuery("player_aggregate_data", parameters.queries.table, parameters.queries.steamid64)
         data= results.collect {row ->
             def fVal= null
             def lower= row.stat.toLowerCase()
