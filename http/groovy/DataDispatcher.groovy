@@ -3,7 +3,6 @@
  * and open the template in the editor.
  */
 
-import com.github.etsai.kfsxtrackingserver.Reader
 import com.github.etsai.kfsxtrackingserver.web.Resource
 import com.github.etsai.utils.Time
 

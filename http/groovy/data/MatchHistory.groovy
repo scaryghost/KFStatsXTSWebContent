@@ -7,13 +7,13 @@ public class MatchHistory extends DataTableCreator {
         super(parameters.queries)
         this.reader= parameters.reader
         this.steamid64= parameters.queries.steamid64
-        this.totalNumRecords= parameters.reader.getNumMatches(this.steamid64)
+        this.totalNumRecords= parameters.reader.executeQuery("player_num_matches", this.steamid64)
     }
 
     public def getData() {
         def data= []
 
-        reader.getMatchHistory(steamid64, group, order, start, end).each {row ->
+        reader.executeQuery("player_history", steamid64, group, order, start, end).each {row ->
             data << [row.level, row.difficulty, row.length, row.result, row.wave, 
                     Time.secToStr(row.duration), row.timestamp]
         }

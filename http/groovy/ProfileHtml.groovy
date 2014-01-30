@@ -15,7 +15,7 @@ public class ProfileHtml extends IndexHtml {
     }
 
     public String getPageTitle() {
-        def info= reader.getSteamIDInfo(queries.steamid64)
+        def info= reader.executeQuery("player_info", queries.steamid64)
         def name= info == null ? "Player Not Found" : info.name
         return "${super.getPageTitle()} - $name"
     }
@@ -75,14 +75,14 @@ ${js}
 
     protected void buildXml(def builder) {
         def steamid64= queries.steamid64
-        def record= reader.getRecord(steamid64)
-        def matchHistory= reader.getMatchHistory(steamid64)
+        def record= reader.executeQuery("server_record", steamid64)
+        def matchHistory= reader.executeQuery("player_history", steamid64)
 
         builder.kfstatsx() {
             if (record == null) {
                 'error'("No stats available for steamdID64: ${steamid64}")
             } else {
-                def steamInfo= reader.getSteamIDInfo(steamid64)
+                def steamInfo= reader.executeQuery("player_info", steamid64)
                 def profileAttr= [steamid64: steamid64, name: steamInfo.name, avatar: steamInfo.avatar, wins: record.wins, losses: record.losses,
                         disconnects: record.disconnects, finales_played: record.finales_played, finales_survived: record.finales_survived,
                         time: record.time]
@@ -137,9 +137,9 @@ ${js}
                             }
                         }
                     }
-                    reader.getStatCategories().each {category ->
+                    reader.executeQuery("server_categories").each {category ->
                         'stats'(category: category) {
-                            reader.getAggregateData(category, steamid64).each {row ->
+                            reader.executeQuery("server_aggregate_data", category, steamid64).each {row ->
                                 def attr= [stat: row.stat, value: row.value]
                                 builder.'entry'(attr) {
                                     if (category == "perks" || attr.stat.toLowerCase().contains("time")) {

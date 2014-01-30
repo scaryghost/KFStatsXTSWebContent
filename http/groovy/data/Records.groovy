@@ -6,14 +6,14 @@ public class Records extends DataTableCreator {
     public Records(Map parameters) {
         super(parameters.queries)
         this.reader= parameters.reader
-        this.totalNumRecords= parameters.reader.getNumRecords()
+        this.totalNumRecords= parameters.reader.executeQuery("server_num_record")
     }
 
     public def getData() {
         def data= []
 
-        reader.getRecords(group, order, start, end).each {row ->
-            def steamInfo= reader.getSteamIDInfo(row.steamid64)
+        reader.executeQuery("server_records", group, order, start, end).each {row ->
+            def steamInfo= reader.executeQuery("player_info", row.steamid64)
             data << ["<a href=profile.html?steamid64=${row.steamid64}>${steamInfo.name}</a>", row.wins, 
                         row.losses, row.disconnects, Time.secToStr(row.time)]
         }

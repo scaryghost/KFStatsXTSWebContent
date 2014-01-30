@@ -1,4 +1,4 @@
-import com.github.etsai.kfsxtrackingserver.DataReader.Order
+import com.github.etsai.kfsxtrackingserver.DefaultReader.Order
 import groovy.json.JsonBuilder
 
 public abstract class DataTableCreator implements DataCreator {

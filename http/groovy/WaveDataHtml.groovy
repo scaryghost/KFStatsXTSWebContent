@@ -1,4 +1,3 @@
-import com.github.etsai.kfsxtrackingserver.DataReader
 import com.github.etsai.kfsxtrackingserver.web.Resource
 import com.github.etsai.utils.Time
 import groovy.xml.MarkupBuilder
@@ -6,7 +5,7 @@ import groovy.xml.MarkupBuilder
 public class WaveDataHtml extends WebPageBase {
     public WaveDataHtml() {
         super()
-        categoryMthd= "getWaveDataCategories"
+        categoryMthd= "server_wave_categories"
         stylesheets << 'http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css'
         jsFiles << 'http://code.jquery.com/ui/1.10.3/jquery-ui.js'
     }

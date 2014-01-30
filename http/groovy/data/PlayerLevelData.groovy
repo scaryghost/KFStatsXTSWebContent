@@ -13,7 +13,7 @@ public class PlayerLevelData extends GoogleChartsCreator {
     }
 
     public def getData() {
-        def leveldata= WebCommon.aggregateMatchHistory(reader.getMatchHistory(steamid64), true)
+        def leveldata= WebCommon.aggregateMatchHistory(reader.executeQuery("player_all_histories", steamid64), true)
         def totals= [win: 0, loss: 0, disconnect:0, time:0]
         def data= []
 

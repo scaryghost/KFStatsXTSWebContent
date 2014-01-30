@@ -10,7 +10,7 @@ public class PlayerProfile extends HtmlTableCreator {
     }
 
     public String create() {
-        def row= reader.getRecord(steamid64);
+        def row= reader.executeQuery("server_record", steamid64);
         def keys= [wins: "Wins", losses: "Losses", disconnects: "Disconnects", finales_played: "Finales Played", 
             finales_survived: "Finales Survived", time: "Time Connected"]
         def stats= [:]
@@ -26,7 +26,7 @@ public class PlayerProfile extends HtmlTableCreator {
             keys.each {key, title ->
                 stats[key]= row[key]
             }
-            steamIdInfo= reader.getSteamIDInfo(steamid64)
+            steamIdInfo= reader.executeQuery("player_info", steamid64)
         }
         builder.table(tableAttr) {
             thead() {

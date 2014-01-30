@@ -14,7 +14,7 @@ public class ServerLevelData extends GoogleChartsCreator {
         def totals= [wins: 0, losses: 0, time: 0]
         def data= []
 
-        reader.getLevelData(level).each {row ->
+        reader.executeQuery("server_level_data", level).each {row ->
             def genHref= {
                 "wavedata.html?difficulty=${row.difficulty}&length=${row.length}&level=${level}"
             }

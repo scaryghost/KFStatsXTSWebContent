@@ -13,7 +13,7 @@ public class PlayerDifficulty extends GoogleChartsCreator {
 
     public def getData() {
         def data= []
-        def difficulties= WebCommon.aggregateCombineMatchHistory(reader.getMatchHistory(steamid64), false)
+        def difficulties= WebCommon.aggregateCombineMatchHistory(reader.executeQuery("player_all_histories", steamid64), false)
 
         def totals= [win: 0, loss: 0, disconnect:0, time:0]
         difficulties.each {setting, stats ->

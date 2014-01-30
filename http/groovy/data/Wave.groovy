@@ -7,8 +7,8 @@ public class Wave extends GoogleChartsCreator {
         super()
 
         def waveSplit= [:], statKeys= new TreeSet()
-        def waveData= parameters.queries.level == null ? parameters.reader.getWaveData(parameters.queries.difficulty, parameters.queries.length, parameters.queries.group) : 
-                parameters.reader.getWaveData(parameters.queries.level, parameters.queries.difficulty, parameters.queries.length, parameters.queries.group)
+        def waveData= parameters.queries.level == null ? parameters.reader.executeQuery("server_wave_data", parameters.queries.difficulty, parameters.queries.length, parameters.queries.group) : 
+                parameters.reader.executeQuery("server_level_wave_data", parameters.queries.level, parameters.queries.difficulty, parameters.queries.length, parameters.queries.group)
 
         waveData.each {row ->
             statKeys << row.stat

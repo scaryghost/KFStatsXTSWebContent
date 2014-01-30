@@ -16,7 +16,7 @@ public class ServerDifficultyData extends GoogleChartsCreator {
         def totals= [wins: 0, losses: 0, time: 0, wave_sum: 0]
         def data= []
 
-        reader.getDifficultyData(difficulty, length).each {row ->
+        reader.executeQuery("server_difficulty_data", difficulty, length).each {row ->
             def avgWave= WebCommon.computeAvgWave(row)
 
             data << [c: [[v: row.level, f:"<a href='wavedata.html?difficulty=${difficulty}&length=${length}&level=${row.level}'>${row.level}</a>"], 

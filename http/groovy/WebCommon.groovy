@@ -1,5 +1,5 @@
-import com.github.etsai.kfsxtrackingserver.DataReader.Order
-import com.github.etsai.kfsxtrackingserver.DataReader.Record
+import com.github.etsai.kfsxtrackingserver.DefaultReader.Order
+import com.github.etsai.kfsxtrackingserver.DefaultReader.Record
 import com.github.etsai.utils.Time
 import groovy.xml.MarkupBuilder
 

@@ -21,7 +21,7 @@ public class MatchHistoryHtml extends PagedTable {
     }
 
     public String getPageTitle() {
-        def info= reader.getSteamIDInfo(queries.steamid64)
+        def info= reader.executeQuery("player_info", queries.steamid64)
         def name
         if (info == null) {
             name= "Invalid SteamID64"
