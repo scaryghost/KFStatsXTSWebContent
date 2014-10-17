@@ -30,7 +30,8 @@ public class ServerDifficultyData extends GoogleChartsCreator {
             totals.time+= row.time
             totals.wave_sum+= row.wave_sum
         }
-        def totalAvgWave= totals.wave_sum / (totals.wins + totals.losses)
+        def totalGames= totals.wins + totals.losses
+        def totalAvgWave= (totalGames == 0) ? 0 : totals.wave_sum / (totalGames)
         data << [c: [[v: "Totals"], 
             [v: totals.wins, p: centerAlign],
             [v: totals.losses, p: centerAlign],
