@@ -1,4 +1,4 @@
-import com.github.etsai.utils.Time
+import scaryghost.utils.Time
 
 public class ServerDifficulty extends GoogleChartsCreator {
     private final static def columnNames= [["Difficulty", "string"], ["Length", "string"], ["Wins", "number"],

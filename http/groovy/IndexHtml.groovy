@@ -1,5 +1,5 @@
-import com.github.etsai.kfsxtrackingserver.web.Resource
-import com.github.etsai.utils.Time
+import scaryghost.kfsxtrackingserver.web.Resource
+import scaryghost.utils.Time
 
 public class IndexHtml extends WebPageBase {
     protected def chartTypes= [deaths: 'BarChart', perks: 'PieChart', weapons: 'BarChart', kills: 'BarChart']

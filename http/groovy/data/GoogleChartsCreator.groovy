@@ -1,4 +1,4 @@
-import com.github.etsai.utils.Time
+import scaryghost.utils.Time
 import groovy.json.JsonBuilder
 
 public abstract class GoogleChartsCreator implements DataCreator {

@@ -1,6 +1,6 @@
-import com.github.etsai.kfsxtrackingserver.DefaultReader.Order
-import com.github.etsai.kfsxtrackingserver.DefaultReader.Record
-import com.github.etsai.utils.Time
+import scaryghost.kfsxtrackingserver.DefaultReader.Order
+import scaryghost.kfsxtrackingserver.DefaultReader.Record
+import scaryghost.utils.Time
 import groovy.xml.MarkupBuilder
 
 public class WebCommon {

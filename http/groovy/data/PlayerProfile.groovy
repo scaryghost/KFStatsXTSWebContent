@@ -1,4 +1,4 @@
-import com.github.etsai.utils.Time
+import scaryghost.utils.Time
 
 public class PlayerProfile extends HtmlTableCreator {
     private final def reader, steamid64

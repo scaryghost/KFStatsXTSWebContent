@@ -1,4 +1,4 @@
-import com.github.etsai.utils.Time
+import scaryghost.utils.Time
 
 public class Records extends DataTableCreator {
     private final def reader, totalNumRecords

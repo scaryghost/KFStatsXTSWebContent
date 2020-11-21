@@ -1,5 +1,5 @@
-import com.github.etsai.kfsxtrackingserver.ReaderWrapper
-import com.github.etsai.kfsxtrackingserver.web.Resource
+import scaryghost.kfsxtrackingserver.ReaderWrapper
+import scaryghost.kfsxtrackingserver.web.Resource
 import groovy.xml.MarkupBuilder
 
 public abstract class WebPageBase extends Resource {

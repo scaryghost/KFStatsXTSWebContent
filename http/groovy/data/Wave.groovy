@@ -1,4 +1,4 @@
-import com.github.etsai.utils.Time
+import scaryghost.utils.Time
 
 public class Wave extends GoogleChartsCreator {
     private final def data

@@ -1,4 +1,4 @@
-import com.github.etsai.utils.Time
+import scaryghost.utils.Time
 
 public class MatchHistory extends DataTableCreator {
     private final def reader, totalNumRecords, steamid64

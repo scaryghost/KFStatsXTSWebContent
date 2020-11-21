@@ -1,4 +1,4 @@
-import com.github.etsai.utils.Time
+import scaryghost.utils.Time
 
 public class RecordsHtml extends PagedTable {
     public RecordsHtml() {
